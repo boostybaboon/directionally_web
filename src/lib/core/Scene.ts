@@ -7,7 +7,12 @@ export interface CommandExecutor {
     redo(): void;
 }
 
-export class Scene implements CommandExecutor {
+export interface SceneChanger {
+    addObject3D(object: THREE.Object3D): void;
+    removeObject3D(object: THREE.Object3D): void;
+}
+
+export class Scene implements CommandExecutor, SceneChanger {
     private threeScene: THREE.Scene;
     private commandHistory: CommandHistory;
 
@@ -33,5 +38,13 @@ export class Scene implements CommandExecutor {
         if (command) {
             command.execute(this);
         }
+    }
+
+    public addObject3D(object: THREE.Object3D): void {
+        this.threeScene.add(object);
+    }
+
+    public removeObject3D(object: THREE.Object3D): void {
+        this.threeScene.remove(object);
     }
 } 
