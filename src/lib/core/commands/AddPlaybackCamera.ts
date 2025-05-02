@@ -2,8 +2,9 @@ import * as THREE from 'three';
 import type { Command } from '../Command';
 import type { SceneChanger } from '../Scene';
 
-export class AddPerspectiveCamera implements Command {
+export class AddPlaybackCamera implements Command {
     private camera: THREE.PerspectiveCamera;
+    private cameraId: string | null = null;
 
     constructor(
         fov: number = 75,
@@ -18,10 +19,13 @@ export class AddPerspectiveCamera implements Command {
     }
 
     execute(scene: SceneChanger): void {
-        scene.addObject3D(this.camera);
+        this.cameraId = scene.addPlaybackCamera(this.camera);
     }
 
     undo(scene: SceneChanger): void {
-        scene.removeObject3D(this.camera);
+        if (this.cameraId) {
+            scene.removePlaybackCamera(this.cameraId);
+            this.cameraId = null;
+        }
     }
 } 
