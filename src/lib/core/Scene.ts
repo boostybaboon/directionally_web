@@ -16,12 +16,46 @@ export interface SceneChanger {
     removePlaybackCamera(cameraId: string): void;
 }
 
-export class Scene implements CommandExecutor, SceneChanger {
+export enum CameraType {
+    Design,
+    Playback,
+    // Future camera types can be added here
+}
+
+export interface CameraView {
+    getCamera(): THREE.PerspectiveCamera;
+    getCameraType(): CameraType;
+}
+
+export class SingleCameraView implements CameraView {
+    private camera: THREE.PerspectiveCamera;
+    private cameraType: CameraType;
+
+    constructor(camera: THREE.PerspectiveCamera, cameraType: CameraType) {
+        this.camera = camera;
+        this.cameraType = cameraType;
+    }
+
+    public getCamera(): THREE.PerspectiveCamera {
+        return this.camera;
+    }
+    
+    public getCameraType(): CameraType {
+        return this.cameraType;
+    }
+}
+
+export interface SceneViewer {
+    getCameraViews(): readonly CameraView[];
+}
+
+export class Scene implements CommandExecutor, SceneChanger, SceneViewer {
     private threeScene: THREE.Scene;
     private commandHistory: CommandHistory;
     private designCameras: Map<string, THREE.PerspectiveCamera> = new Map();
     private playbackCameras: Map<string, THREE.PerspectiveCamera> = new Map();
     private nextCameraId: number = 0;
+    private cameraViews: CameraView[] = [];
 
     constructor() {
         this.threeScene = new THREE.Scene();
@@ -55,10 +89,18 @@ export class Scene implements CommandExecutor, SceneChanger {
         this.threeScene.remove(object);
     }
 
+    public getCameraViews(): readonly CameraView[] {
+        return this.cameraViews;
+    }
+
     public addDesignCamera(camera: THREE.PerspectiveCamera): string {
         const cameraId = `design_camera_${this.nextCameraId++}`;
         this.designCameras.set(cameraId, camera);
         this.threeScene.add(camera);
+
+        const cameraView = new SingleCameraView(camera, CameraType.Design);
+        this.cameraViews.push(cameraView);
+
         return cameraId;
     }
 
@@ -67,6 +109,10 @@ export class Scene implements CommandExecutor, SceneChanger {
         if (camera) {
             this.threeScene.remove(camera);
             this.designCameras.delete(cameraId);
+
+            this.cameraViews = this.cameraViews.filter(
+                (view) => view.getCamera() !== camera
+            );
         }
     }
 
@@ -74,6 +120,10 @@ export class Scene implements CommandExecutor, SceneChanger {
         const cameraId = `playback_camera_${this.nextCameraId++}`;
         this.playbackCameras.set(cameraId, camera);
         this.threeScene.add(camera);
+
+        const cameraView = new SingleCameraView(camera, CameraType.Playback);
+        this.cameraViews.push(cameraView);
+
         return cameraId;
     }
 
@@ -82,6 +132,10 @@ export class Scene implements CommandExecutor, SceneChanger {
         if (camera) {
             this.threeScene.remove(camera);
             this.playbackCameras.delete(cameraId);
+
+            this.cameraViews = this.cameraViews.filter(
+                (view) => view.getCamera() !== camera
+            );
         }
     }
-} 
+}
