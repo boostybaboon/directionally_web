@@ -1,53 +1,12 @@
 import * as THREE from 'three';
-import { CommandHistory, type Command } from './Command';
-
-export interface CommandExecutor {
-    execute(command: Command): void;
-    undo(): void;
-    redo(): void;
-}
-
-export interface SceneChanger {
-    addObject3D(object: THREE.Object3D): void;
-    removeObject3D(object: THREE.Object3D): void;
-    addDesignCamera(camera: THREE.PerspectiveCamera): string;
-    removeDesignCamera(cameraId: string): void;
-    addPlaybackCamera(camera: THREE.PerspectiveCamera): string;
-    removePlaybackCamera(cameraId: string): void;
-}
-
-export enum CameraType {
-    Design,
-    Playback,
-    // Future camera types can be added here
-}
-
-export interface CameraView {
-    getCamera(): THREE.PerspectiveCamera;
-    getCameraType(): CameraType;
-}
-
-export class SingleCameraView implements CameraView {
-    private camera: THREE.PerspectiveCamera;
-    private cameraType: CameraType;
-
-    constructor(camera: THREE.PerspectiveCamera, cameraType: CameraType) {
-        this.camera = camera;
-        this.cameraType = cameraType;
-    }
-
-    public getCamera(): THREE.PerspectiveCamera {
-        return this.camera;
-    }
-    
-    public getCameraType(): CameraType {
-        return this.cameraType;
-    }
-}
-
-export interface SceneViewer {
-    getCameraViews(): readonly CameraView[];
-}
+import { CommandHistory } from './Command';
+import type { Command } from './Command';
+import type { CommandExecutor } from './interfaces/CommandExecutor';
+import type { SceneChanger } from './interfaces/SceneChanger';
+import type { SceneViewer } from './interfaces/SceneViewer';
+import type { CameraView } from './interfaces/CameraView';
+import { CameraType } from './types/CameraType';
+import { SingleCameraView } from './views/SingleCameraView';
 
 export class Scene implements CommandExecutor, SceneChanger, SceneViewer {
     private threeScene: THREE.Scene;
