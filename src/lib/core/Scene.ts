@@ -21,6 +21,10 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer {
         this.commandHistory = new CommandHistory();
     }
 
+    public getScene(): THREE.Scene {
+        return this.threeScene;
+    }
+
     public execute(command: Command): void {
         command.execute(this);
         this.commandHistory.push(command);

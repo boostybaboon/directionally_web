@@ -1,0 +1,8 @@
+{
+    "vitest.enable": true,
+    "vitest.commandLine": "yarn test",
+    "vitest.autoDetect": true,
+    "testExplorer.useNativeTesting": true,
+    "testExplorer.addToEditorContextMenu": true,
+    "testExplorer.codeLens": true
+} 
