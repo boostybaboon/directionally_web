@@ -1,6 +1,6 @@
 import * as THREE from 'three';
+import { CameraType } from '../types/CameraType';
 import type { CameraView } from '../interfaces/CameraView';
-import type { CameraType } from '../types/CameraType';
 
 export class SingleCameraView implements CameraView {
     private camera: THREE.PerspectiveCamera;
@@ -18,4 +18,4 @@ export class SingleCameraView implements CameraView {
     public getCameraType(): CameraType {
         return this.cameraType;
     }
-} 
+}
