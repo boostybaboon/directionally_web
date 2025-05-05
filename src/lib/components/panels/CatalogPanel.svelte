@@ -1,38 +1,50 @@
 <script lang="ts">
   import { CatalogItemType } from '$lib/core/types/CatalogItemType';
-  // Import TreeView and its types
-  import TreeView from '$lib/ui/components/TreeView.svelte';
-  import type { TreeNode } from '$lib/ui/components/TreeView.svelte';
+  import { StandardCatalogBuilder } from '$lib/core/catalog/StandardCatalogBuilder';
+  import { documentService } from '$lib/stores/DocumentStore';
+  import TreeView from '$lib/components/common/TreeView.svelte';
+  import type { TreeNode } from '$lib/components/common/TreeView.svelte';
+  import type { CommandExecutor } from '$lib/core/interfaces/CommandExecutor';
   
-  // Create catalog tree structure
+  // Create a standard catalog
+  const catalogBuilder = new StandardCatalogBuilder();
+  const catalog = catalogBuilder.build();
+  
+  // Create catalog tree structure from actual catalog items
+  const meshes = catalog.getItemsByType(CatalogItemType.Mesh);
+  const lights = catalog.getItemsByType(CatalogItemType.Light);
+  const cameras = catalog.getItemsByType(CatalogItemType.Camera);
+  
   const catalogData: TreeNode[] = [
     {
       id: 'meshes',
       label: 'Meshes',
       icon: '📦',
-      children: [
-        { id: 'cube', label: 'Cube', data: { type: CatalogItemType.Mesh } },
-        { id: 'sphere', label: 'Sphere', data: { type: CatalogItemType.Mesh } },
-        { id: 'plane', label: 'Plane', data: { type: CatalogItemType.Mesh } }
-      ]
+      children: meshes.map(item => ({
+        id: item.id,
+        label: item.name,
+        data: { catalogItem: item }
+      }))
     },
     {
       id: 'lights',
       label: 'Lights',
       icon: '💡',
-      children: [
-        { id: 'directional_light', label: 'Directional Light', data: { type: CatalogItemType.Light } },
-        { id: 'point_light', label: 'Point Light', data: { type: CatalogItemType.Light } },
-        { id: 'ambient_light', label: 'Ambient Light', data: { type: CatalogItemType.Light } }
-      ]
+      children: lights.map(item => ({
+        id: item.id,
+        label: item.name,
+        data: { catalogItem: item }
+      }))
     },
     {
       id: 'cameras',
       label: 'Cameras',
       icon: '📷',
-      children: [
-        { id: 'perspective_camera', label: 'Perspective Camera', data: { type: CatalogItemType.Camera } }
-      ]
+      children: cameras.map(item => ({
+        id: item.id,
+        label: item.name,
+        data: { catalogItem: item }
+      }))
     }
   ];
 
@@ -46,9 +58,23 @@
   // Handle item selection
   function handleSelect(event: CustomEvent) {
     const { currentNode } = event.detail;
-    if (currentNode && !currentNode.children) {
-      // Only trigger alert for leaf nodes (actual catalog items, not categories)
-      alert(`Inserting ${currentNode.label}`);
+    if (currentNode && !currentNode.children && currentNode.data?.catalogItem) {
+      const item = currentNode.data.catalogItem;
+      const commandExecutor = documentService.commandExecutor;
+      
+      // Check if we have an active document
+      if (commandExecutor) {
+        // Create the command and execute it
+        const command = item.createCommand();
+        commandExecutor.execute(command);
+        documentService.markAsModified();
+        
+        // Provide feedback
+        console.log(`Added ${item.name} to scene`);
+      } else {
+        // No active document
+        alert('Please create a new document first');
+      }
     }
   }
   
