@@ -2,6 +2,8 @@
   import DocumentPanel from '../panels/DocumentPanel.svelte';
   import CatalogPanel from '../panels/CatalogPanel.svelte';
   import SceneGraphPanel from '../panels/SceneGraphPanel.svelte';
+  import { DocumentService } from '../stores/DocumentStore';
+  import type { Scene } from '$lib/core/Scene';
 
   // Simple enum-like type for tab IDs
   type TabId = 'document' | 'catalog' | 'sceneGraph';
@@ -20,6 +22,15 @@
   function switchTab(tabId: TabId) {
     console.log('Switching to tab:', tabId);
     activeTab = tabId;
+  }
+  
+  // Handle document events from DocumentPanel
+  function handleDocumentCreated(event: CustomEvent<{scene: Scene}>) {
+    const { scene } = event.detail;
+    DocumentService.createEmptyScene(scene);
+    
+    // Switch to scene graph view after creating document
+    switchTab('sceneGraph');
   }
 </script>
 
@@ -40,7 +51,7 @@
   <div class="tab-content">
     {#if activeTab === 'document'}
       <div class="panel-header">Document</div>
-      <DocumentPanel />
+      <DocumentPanel on:documentCreated={handleDocumentCreated} />
     {:else if activeTab === 'catalog'}
       <div class="panel-header">Catalog</div>
       <CatalogPanel />

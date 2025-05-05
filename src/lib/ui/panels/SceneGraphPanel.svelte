@@ -1,58 +1,100 @@
 <script lang="ts">
   import TreeView from '$lib/ui/components/TreeView.svelte';
   import type { TreeNode } from '$lib/ui/components/TreeView.svelte';
+  import { DocumentService } from '../stores/DocumentStore';
+  import * as THREE from 'three';
   
-  // Mock scene graph data - this would normally come from your actual scene
-  // and would be updated as the scene changes
-  const sceneGraphData: TreeNode[] = [
-    {
-      id: 'scene',
-      label: 'Scene',
-      icon: '🌍',
-      children: [
-        { 
-          id: 'cube', 
-          label: 'Cube', 
-          icon: '📦',
-          data: { type: 'mesh' } 
-        },
-        { 
-          id: 'directional_light', 
-          label: 'Directional Light', 
-          icon: '💡',
-          data: { type: 'light' } 
-        },
-        { 
-          id: 'main_camera', 
-          label: 'Main Camera', 
-          icon: '📷',
-          data: { type: 'camera' } 
-        }
-      ]
-    }
-  ];
-
-  // TreeView options
-  const treeOptions = {
+  // Subscribe to the scene viewer
+  let sceneViewer: any = null;
+  let sceneGraph: TreeNode[] = [];
+  let treeOptions = {
     selectable: true,
     multiSelect: false,
     initialExpanded: ['scene'] // Expand scene node by default
   };
 
-  // Expand/collapse all functionality
+  // Subscribe to the sceneViewer
+  DocumentService.sceneViewer.subscribe(viewer => {
+    sceneViewer = viewer;
+    updateSceneGraph();
+  });
+  
+  // Convert the scene hierarchy to a TreeNode structure
+  function updateSceneGraph() {
+    if (!sceneViewer) {
+      sceneGraph = []; // No scene, empty graph
+      return;
+    }
+    
+    // Get the Three.js scene
+    const scene = sceneViewer.getScene?.() as THREE.Scene;
+    
+    if (!scene) {
+      sceneGraph = [];
+      return;
+    }
+    
+    // Create the root node
+    sceneGraph = [{
+      id: 'scene',
+      label: 'Scene',
+      icon: '🌍',
+      children: scene.children.map(buildNodeFromObject3D)
+    }];
+  }
+  
+  function buildNodeFromObject3D(object: THREE.Object3D, index = 0): TreeNode {
+    // Generate a unique ID for the node
+    const id = `${object.type.toLowerCase()}_${object.id || index}`;
+    
+    // Determine icon based on object type
+    let icon = '📦'; // Default icon
+    if (object instanceof THREE.Light) {
+      icon = '💡';
+    } else if (object instanceof THREE.Camera) {
+      icon = '📷';
+    } else if (object instanceof THREE.Mesh) {
+      icon = '📦';
+    }
+    
+    // Create the node
+    const node: TreeNode = {
+      id,
+      label: object.name || object.type,
+      icon,
+      data: { object }
+    };
+    
+    // Add children if any
+    if (object.children && object.children.length > 0) {
+      node.children = object.children.map((child, idx) => 
+        buildNodeFromObject3D(child, idx)
+      );
+    }
+    
+    return node;
+  }
+  
+  // Expand/collapse functionality
   function expandAll() {
-    const allNodeIds = getAllNodeIds(sceneGraphData);
-    treeOptions.initialExpanded = allNodeIds;
+    if (!sceneGraph || sceneGraph.length === 0) return;
+    
+    const allNodeIds = getAllNodeIds(sceneGraph);
+    treeOptions = {
+      ...treeOptions,
+      initialExpanded: allNodeIds
+    };
   }
 
   function collapseAll() {
-    treeOptions.initialExpanded = [];
+    treeOptions = {
+      ...treeOptions,
+      initialExpanded: []
+    };
   }
 
   function refreshSceneGraph() {
-    // In a real implementation, this would refresh the scene graph data
-    // from the actual Scene object
-    alert('Refreshing scene graph...');
+    updateSceneGraph();
   }
 
   // Recursive function to get all node IDs
@@ -73,8 +115,11 @@
   // Handle selection
   function handleSelect(event: CustomEvent) {
     const { currentNode } = event.detail;
-    if (currentNode) {
-      alert(`Selected ${currentNode.label}`);
+    if (currentNode && currentNode.data && currentNode.data.object) {
+      const object = currentNode.data.object as THREE.Object3D;
+      console.log('Selected object:', object);
+      // Here you could dispatch an event or call a service to show properties
+      // in the RightSidebar
     }
   }
 </script>
@@ -87,11 +132,15 @@
   </div>
   
   <div class="tree-container">
-    <TreeView 
-      nodes={sceneGraphData} 
-      options={treeOptions}
-      on:select={handleSelect}
-    />
+    {#if sceneGraph.length === 0}
+      <div class="empty-state">No scene available. Create a new document first.</div>
+    {:else}
+      <TreeView 
+        nodes={sceneGraph} 
+        options={treeOptions}
+        on:select={handleSelect}
+      />
+    {/if}
   </div>
 </div>
 
@@ -130,5 +179,12 @@
     padding: 16px;
     overflow-y: auto;
     flex: 1;
+  }
+  
+  .empty-state {
+    padding: 16px;
+    color: #888888;
+    font-style: italic;
+    text-align: center;
   }
 </style>

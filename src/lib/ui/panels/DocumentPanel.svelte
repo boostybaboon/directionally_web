@@ -1,15 +1,45 @@
 <script lang="ts">
-  // Placeholder for document management functionality
+  import { Scene } from '$lib/core/Scene';
+  import { AddDesignCamera } from '$lib/core/commands/AddDesignCamera';
+  import { createEventDispatcher } from 'svelte';
+  import * as THREE from 'three';
+  
+  // Event dispatcher to communicate with parent components
+  const dispatch = createEventDispatcher<{
+    documentCreated: { scene: Scene };
+    documentOpened: { scene: Scene };
+    documentSaved: { scene: Scene };
+  }>();
+  
+  // Document management functionality
   function createNewDocument() {
-    alert('Creating new document...');
+    // Create a new empty scene
+    const scene = new Scene();
+    
+    // Add a default camera
+    const cameraCommand = new AddDesignCamera(
+      75, // FOV
+      0.1, // Near
+      1000, // Far
+      new THREE.Vector3(0, 5, 10), // Position
+      new THREE.Vector3(0, 0, 0)  // Look at
+    );
+    
+    // Execute the command to add the camera
+    scene.execute(cameraCommand);
+    
+    // Dispatch event to notify parent components
+    dispatch('documentCreated', { scene });
   }
   
   function openDocument() {
-    alert('Opening document...');
+    // In a real implementation, this would open a file dialog
+    alert('Opening document... (Not implemented)');
   }
   
   function saveDocument() {
-    alert('Saving document...');
+    // In a real implementation, this would save the current scene
+    alert('Saving document... (Not implemented)');
   }
 </script>
 
@@ -17,7 +47,7 @@
   <div class="action-section">
     <h3>Document Actions</h3>
     <button class="action-button" on:click={createNewDocument}>
-      <span class="icon">📝</span> New Document
+      <span class="icon">📝</span> Empty Scene
     </button>
     
     <button class="action-button" on:click={openDocument}>
