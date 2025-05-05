@@ -24,12 +24,30 @@
   };
   
   // Events
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onDestroy } from 'svelte';
   const dispatch = createEventDispatcher();
   
   // State
   let expandedNodes = new Set(options.initialExpanded || []);
   let selectedNodes = new Set<string>();
+  
+  // Reset internal state when nodes change completely
+  // This helps prevent memory leaks and stale state when switching tabs
+  $: {
+    if (nodes) {
+      // Only reset if this is a top-level tree (not a recursive child)
+      if (nodes.length > 1) {
+        // Keep the expanded state from options
+        expandedNodes = new Set(options.initialExpanded || []);
+      }
+    }
+  }
+  
+  // Clean up any listeners or state when component is destroyed
+  onDestroy(() => {
+    expandedNodes.clear();
+    selectedNodes.clear();
+  });
   
   // Methods
   function toggleExpanded(nodeId: string, event?: Event) {
@@ -88,72 +106,101 @@
         No items available
       </slot>
     </div>
+  {:else if nodes.length > 1}
+    {#each nodes as node (node.id)}
+      <div 
+        class="tree-node"
+        class:selected={selectedNodes.has(node.id)}
+      >
+        <div 
+          class="node-content" 
+          role="button"
+          tabindex="0"
+          on:click={() => toggleSelected(node.id, node)}
+          on:keydown={(e) => handleNodeKeyDown(e, node.id, node)}
+        >
+          {#if node.children && node.children.length > 0}
+            <button 
+              class="expand-button" 
+              on:click={(e) => toggleExpanded(node.id, e)}
+              on:keydown={(e) => handleExpandKeyDown(e, node.id)}
+              aria-label={expandedNodes.has(node.id) ? "Collapse" : "Expand"}
+              aria-expanded={expandedNodes.has(node.id)}
+            >
+              {expandedNodes.has(node.id) ? '▼' : '►'}
+            </button>
+          {:else}
+            <span class="spacer"></span>
+          {/if}
+          
+          {#if node.icon}
+            <span class="node-icon">{node.icon}</span>
+          {/if}
+          
+          <span class="node-label">{node.label}</span>
+        </div>
+        
+        {#if node.children && node.children.length > 0 && expandedNodes.has(node.id)}
+          <div class="node-children">
+            <svelte:self 
+              nodes={node.children} 
+              options={options} 
+              on:select
+            />
+          </div>
+        {/if}
+      </div>
+    {/each}
   {:else}
-    <div class="tree-nodes">
-      {#each nodes as node}
-        <svelte:self 
-          nodes={[node]} 
-          options={options} 
-          on:select
-        />
-      {/each}
+    {@const node = nodes[0]}
+    <div 
+      class="tree-node"
+      class:selected={selectedNodes.has(node.id)}
+    >
+      <div 
+        class="node-content" 
+        role="button"
+        tabindex="0"
+        on:click={() => toggleSelected(node.id, node)}
+        on:keydown={(e) => handleNodeKeyDown(e, node.id, node)}
+      >
+        {#if node.children && node.children.length > 0}
+          <button 
+            class="expand-button" 
+            on:click={(e) => toggleExpanded(node.id, e)}
+            on:keydown={(e) => handleExpandKeyDown(e, node.id)}
+            aria-label={expandedNodes.has(node.id) ? "Collapse" : "Expand"}
+            aria-expanded={expandedNodes.has(node.id)}
+          >
+            {expandedNodes.has(node.id) ? '▼' : '►'}
+          </button>
+        {:else}
+          <span class="spacer"></span>
+        {/if}
+        
+        {#if node.icon}
+          <span class="node-icon">{node.icon}</span>
+        {/if}
+        
+        <span class="node-label">{node.label}</span>
+      </div>
+      
+      {#if node.children && node.children.length > 0 && expandedNodes.has(node.id)}
+        <div class="node-children">
+          <svelte:self 
+            nodes={node.children} 
+            options={options} 
+            on:select
+          />
+        </div>
+      {/if}
     </div>
   {/if}
 </div>
 
-{#if nodes.length === 1}
-  {@const node = nodes[0]}
-  <div 
-    class="tree-node"
-    class:selected={selectedNodes.has(node.id)}
-  >
-    <div 
-      class="node-content" 
-      role="button"
-      tabindex="0"
-      on:click={() => toggleSelected(node.id, node)}
-      on:keydown={(e) => handleNodeKeyDown(e, node.id, node)}
-    >
-      {#if node.children && node.children.length > 0}
-        <button 
-          class="expand-button" 
-          on:click={(e) => toggleExpanded(node.id, e)}
-          on:keydown={(e) => handleExpandKeyDown(e, node.id)}
-          aria-label={expandedNodes.has(node.id) ? "Collapse" : "Expand"}
-          aria-expanded={expandedNodes.has(node.id)}
-        >
-          {expandedNodes.has(node.id) ? '▼' : '►'}
-        </button>
-      {:else}
-        <span class="spacer"></span>
-      {/if}
-      
-      {#if node.icon}
-        <span class="node-icon">{node.icon}</span>
-      {/if}
-      
-      <span class="node-label">{node.label}</span>
-    </div>
-    
-    {#if node.children && node.children.length > 0 && expandedNodes.has(node.id)}
-      <div class="node-children">
-        <svelte:self 
-          nodes={node.children} 
-          options={options} 
-          on:select
-        />
-      </div>
-    {/if}
-  </div>
-{/if}
-
 <style>
   .tree-view {
     user-select: none;
-  }
-  
-  .tree-nodes {
-    display: contents;
   }
   
   .tree-node {
