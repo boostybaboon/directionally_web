@@ -23,9 +23,7 @@
     initialExpanded: []
   };
   
-  // Events
-  import { createEventDispatcher, onDestroy } from 'svelte';
-  const dispatch = createEventDispatcher();
+  import { onDestroy } from 'svelte';
   
   // State
   let expandedNodes = new Set(options.initialExpanded || []);
@@ -77,11 +75,14 @@
       selectedNodes = new Set([nodeId]);
     }
     
-    dispatch('select', { 
-      nodeIds: [...selectedNodes], 
-      nodes: nodes.filter(n => selectedNodes.has(n.id)),
-      currentNode: node
+    const event = new CustomEvent('select', {
+      detail: { 
+        nodeIds: [...selectedNodes], 
+        nodes: nodes.filter(n => selectedNodes.has(n.id)),
+        currentNode: node
+      }
     });
+    document.dispatchEvent(event);
   }
   
   function handleNodeKeyDown(event: KeyboardEvent, nodeId: string, node: TreeNode): void {
@@ -116,14 +117,14 @@
           class="node-content" 
           role="button"
           tabindex="0"
-          on:click={() => toggleSelected(node.id, node)}
-          on:keydown={(e) => handleNodeKeyDown(e, node.id, node)}
+          onclick={() => toggleSelected(node.id, node)}
+          onkeydown={(e) => handleNodeKeyDown(e, node.id, node)}
         >
           {#if node.children && node.children.length > 0}
             <button 
               class="expand-button" 
-              on:click={(e) => toggleExpanded(node.id, e)}
-              on:keydown={(e) => handleExpandKeyDown(e, node.id)}
+              onclick={(e) => toggleExpanded(node.id, e)}
+              onkeydown={(e) => handleExpandKeyDown(e, node.id)}
               aria-label={expandedNodes.has(node.id) ? "Collapse" : "Expand"}
               aria-expanded={expandedNodes.has(node.id)}
             >
@@ -145,7 +146,6 @@
             <svelte:self 
               nodes={node.children} 
               options={options} 
-              on:select
             />
           </div>
         {/if}
@@ -161,14 +161,14 @@
         class="node-content" 
         role="button"
         tabindex="0"
-        on:click={() => toggleSelected(node.id, node)}
-        on:keydown={(e) => handleNodeKeyDown(e, node.id, node)}
+        onclick={() => toggleSelected(node.id, node)}
+        onkeydown={(e) => handleNodeKeyDown(e, node.id, node)}
       >
         {#if node.children && node.children.length > 0}
           <button 
             class="expand-button" 
-            on:click={(e) => toggleExpanded(node.id, e)}
-            on:keydown={(e) => handleExpandKeyDown(e, node.id)}
+            onclick={(e) => toggleExpanded(node.id, e)}
+            onkeydown={(e) => handleExpandKeyDown(e, node.id)}
             aria-label={expandedNodes.has(node.id) ? "Collapse" : "Expand"}
             aria-expanded={expandedNodes.has(node.id)}
           >
@@ -190,7 +190,6 @@
           <svelte:self 
             nodes={node.children} 
             options={options} 
-            on:select
           />
         </div>
       {/if}
