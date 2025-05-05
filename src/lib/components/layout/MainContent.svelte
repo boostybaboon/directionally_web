@@ -2,7 +2,8 @@
   import { onMount, onDestroy } from 'svelte';
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import { DocumentService } from '../stores/DocumentStore';
+  import { documentService } from '$lib/stores/DocumentStore.svelte';
+  import type { DocumentState } from '$lib/stores/DocumentStore.svelte';
   import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
   import type { CameraView } from '$lib/core/interfaces/CameraView';
   import { CameraType } from '$lib/core/types/CameraType';
@@ -21,7 +22,7 @@
   let activeCameraType: CameraType | null = null;
   
   // Subscribe to document store to get the actual scene
-  const documentUnsubscribe = DocumentService.subscribe(state => {
+  const documentUnsubscribe = documentService.subscribe((state: DocumentState) => {
     activeScene = state.scene;
     
     // If we have a scene, get the THREE.Scene from it

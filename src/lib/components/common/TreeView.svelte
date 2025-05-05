@@ -22,6 +22,7 @@
     multiSelect: false,
     initialExpanded: []
   };
+  export let onselect: ((event: CustomEvent) => void) | undefined = undefined;
   
   import { onDestroy } from 'svelte';
   
@@ -82,6 +83,9 @@
         currentNode: node
       }
     });
+    if (onselect) {
+      onselect(event);
+    }
     document.dispatchEvent(event);
   }
   
@@ -145,7 +149,8 @@
           <div class="node-children">
             <svelte:self 
               nodes={node.children} 
-              options={options} 
+              options={options}
+              onselect={onselect}
             />
           </div>
         {/if}
@@ -189,7 +194,8 @@
         <div class="node-children">
           <svelte:self 
             nodes={node.children} 
-            options={options} 
+            options={options}
+            onselect={onselect}
           />
         </div>
       {/if}

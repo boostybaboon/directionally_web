@@ -1,7 +1,7 @@
 <script lang="ts">
   import TreeView from '$lib/components/common/TreeView.svelte';
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
-  import { documentService } from '$lib/stores/DocumentStore';
+  import { documentService } from '$lib/stores/DocumentStore.svelte';
   import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
   import * as THREE from 'three';
   
@@ -122,7 +122,7 @@
       <TreeView 
         nodes={sceneGraph} 
         options={treeOptions}
-        on:select={handleSelect}
+        onselect={handleSelect}
       />
     {/if}
   </div>

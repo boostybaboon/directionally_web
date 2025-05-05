@@ -2,7 +2,7 @@
   import DocumentPanel from '../panels/DocumentPanel.svelte';
   import CatalogPanel from '../panels/CatalogPanel.svelte';
   import SceneGraphPanel from '../panels/SceneGraphPanel.svelte';
-  import { DocumentService } from '../stores/DocumentStore';
+  import { documentService } from '$lib/stores/DocumentStore.svelte';
   import type { Scene } from '$lib/core/Scene';
 
   // Simple enum-like type for tab IDs
@@ -27,7 +27,7 @@
   // Handle document events from DocumentPanel
   function handleDocumentCreated(event: CustomEvent<{scene: Scene}>) {
     const { scene } = event.detail;
-    DocumentService.createEmptyScene(scene);
+    documentService.createEmptyScene(scene);
     
     // Switch to scene graph view after creating document
     switchTab('sceneGraph');
