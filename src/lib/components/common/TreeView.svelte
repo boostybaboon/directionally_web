@@ -104,7 +104,7 @@
   }
 </script>
 
-<div class="tree-view">
+<div class="tree-view" role="tree">
   {#if nodes.length === 0}
     <div class="empty-state">
       <slot name="empty">
@@ -116,19 +116,29 @@
       <div 
         class="tree-node"
         class:selected={selectedNodes.has(node.id)}
+        role="treeitem"
+        aria-selected={selectedNodes.has(node.id)}
+        tabindex={selectedNodes.has(node.id) ? 0 : -1}
+        on:click={() => toggleSelected(node.id, node)}
+        on:keydown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggleSelected(node.id, node);
+          }
+        }}
       >
-        <div 
-          class="node-content" 
-          role="button"
-          tabindex="0"
-          onclick={() => toggleSelected(node.id, node)}
-          onkeydown={(e) => handleNodeKeyDown(e, node.id, node)}
-        >
+        <div class="node-content">
           {#if node.children && node.children.length > 0}
             <button 
               class="expand-button" 
-              onclick={(e) => toggleExpanded(node.id, e)}
-              onkeydown={(e) => handleExpandKeyDown(e, node.id)}
+              type="button"
+              on:click={(e) => toggleExpanded(node.id, e)}
+              on:keydown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggleExpanded(node.id, e);
+                }
+              }}
               aria-label={expandedNodes.has(node.id) ? "Collapse" : "Expand"}
               aria-expanded={expandedNodes.has(node.id)}
             >
@@ -146,10 +156,10 @@
         </div>
         
         {#if node.children && node.children.length > 0 && expandedNodes.has(node.id)}
-          <div class="node-children">
+          <div class="node-children" role="group">
             <svelte:self 
               nodes={node.children} 
-              options={options}
+              options={options} 
               onselect={onselect}
             />
           </div>
@@ -161,19 +171,29 @@
     <div 
       class="tree-node"
       class:selected={selectedNodes.has(node.id)}
+      role="treeitem"
+      aria-selected={selectedNodes.has(node.id)}
+      tabindex={selectedNodes.has(node.id) ? 0 : -1}
+      on:click={() => toggleSelected(node.id, node)}
+      on:keydown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          toggleSelected(node.id, node);
+        }
+      }}
     >
-      <div 
-        class="node-content" 
-        role="button"
-        tabindex="0"
-        onclick={() => toggleSelected(node.id, node)}
-        onkeydown={(e) => handleNodeKeyDown(e, node.id, node)}
-      >
+      <div class="node-content">
         {#if node.children && node.children.length > 0}
           <button 
             class="expand-button" 
-            onclick={(e) => toggleExpanded(node.id, e)}
-            onkeydown={(e) => handleExpandKeyDown(e, node.id)}
+            type="button"
+            on:click={(e) => toggleExpanded(node.id, e)}
+            on:keydown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleExpanded(node.id, e);
+              }
+            }}
             aria-label={expandedNodes.has(node.id) ? "Collapse" : "Expand"}
             aria-expanded={expandedNodes.has(node.id)}
           >
@@ -191,10 +211,10 @@
       </div>
       
       {#if node.children && node.children.length > 0 && expandedNodes.has(node.id)}
-        <div class="node-children">
+        <div class="node-children" role="group">
           <svelte:self 
             nodes={node.children} 
-            options={options}
+            options={options} 
             onselect={onselect}
           />
         </div>
@@ -218,6 +238,11 @@
     padding: 4px 8px;
     border-radius: 2px;
     cursor: pointer;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: inherit;
   }
   
   .node-content:hover {
