@@ -4,4 +4,5 @@ import { CameraType } from '../types/CameraType';
 export interface CameraView {
     getCamera(): THREE.PerspectiveCamera;
     getCameraType(): CameraType;
+    updateAspectRatio(aspect: number): void;
 }

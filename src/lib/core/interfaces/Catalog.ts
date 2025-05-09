@@ -5,15 +5,18 @@ import { CatalogItemType } from '../types/CatalogItemType';
 export interface CatalogItem {
     id: string;
     name: string;
-    type: CatalogItemType;
+    type: string;
+    metadata: Record<string, any>;
     createCommand(): Command;
     getPreview(): THREE.Object3D;
 }
 
 export interface Catalog {
-    getItems(): readonly CatalogItem[];
-    getItemById(id: string): CatalogItem | undefined;
-    getItemsByType(type: CatalogItemType): readonly CatalogItem[];
+    items: CatalogItem[];
+    
     addItem(item: CatalogItem): void;
     removeItem(id: string): void;
+    getItem(id: string): CatalogItem | undefined;
+    getAllItems(): CatalogItem[];
+    getItemsByType(type: string): CatalogItem[];
 } 

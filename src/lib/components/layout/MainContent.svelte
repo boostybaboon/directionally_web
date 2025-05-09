@@ -1,9 +1,8 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy } from 'svelte';
   import { viewService } from '$lib/stores/ViewStore.svelte';
-  import { documentService } from '$lib/stores/DocumentStore.svelte';
   import type { View } from '$lib/stores/ViewStore.svelte';
-  import type { Scene } from '$lib/core/Scene';
+  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
   import WelcomeView from '../views/WelcomeView.svelte';
   import View3D from '../views/View3D.svelte';
   
@@ -17,15 +16,17 @@
   });
   
   // Handle document creation
-  function handleDocumentCreated(event: CustomEvent<{scene: Scene}>) {
-    const { scene } = event.detail;
-    documentService.createEmptyScene(scene);
+  function handleDocumentCreated(event: CustomEvent<{document: DocumentInterfaces}>) {
+    const { document } = event.detail;
     
     // Create a new 3D view
     viewService.addView({
       title: 'Scene View',
       type: 'view3d',
-      data: { scene }
+      data: { 
+        scene: document.sceneViewer.getScene(),
+        cameraViews: document.sceneViewer.getCameraViews()
+      }
     });
   }
   
@@ -63,17 +64,19 @@
         aria-selected={view.id === activeViewId}
         tabindex={view.id === activeViewId ? 0 : -1}
       >
-        <span class="tab-title">{view.title}</span>
-        {#if view.id !== 'welcome'}
-          <button 
-            class="close-button"
-            on:click={(e) => handleTabClose(view.id, e)}
-            title="Close"
-            type="button"
-          >
-            ×
-          </button>
-        {/if}
+        <div class="tab-content">
+          <span class="tab-title">{view.title}</span>
+          {#if view.id !== 'welcome'}
+            <button 
+              class="close-button"
+              on:click={(e) => handleTabClose(view.id, e)}
+              title="Close"
+              type="button"
+            >
+              ×
+            </button>
+          {/if}
+        </div>
       </div>
     {/each}
   </div>
@@ -88,7 +91,8 @@
           <WelcomeView />
         {:else if view.type === 'view3d'}
           <View3D 
-            scene={view.data.scene} 
+            scene={view.data.scene}
+            cameraViews={view.data.cameraViews}
           />
         {/if}
       </div>
@@ -174,5 +178,11 @@
   
   .view.active {
     display: block;
+  }
+  
+  .tab-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
   }
 </style>

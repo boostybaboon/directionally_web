@@ -2,137 +2,72 @@
   import { onMount, onDestroy } from 'svelte';
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import type { Scene as DirectionallyScene } from '$lib/core/Scene';
+  import type { Scene } from '$lib/core/Scene';
   import type { CameraView } from '$lib/core/interfaces/CameraView';
   import { CameraType } from '$lib/core/types/CameraType';
   
   // Props
-  export let scene: DirectionallyScene;
+  export let scene: Scene;
+  export let cameraViews: CameraView[];
   
   // View state
   let container: HTMLElement;
   let renderer: THREE.WebGLRenderer;
-  let threeScene: THREE.Scene;
-  let activeCamera: THREE.PerspectiveCamera | null = null;
-  let cameraViews: readonly CameraView[] = [];
+  let activeCamera: CameraView;
   let animationFrameId: number | null = null;
   let controls: OrbitControls | null = null;
   let activeCameraType: CameraType | null = null;
   
-  // Initialize WebGL renderer
+  // Initialize
   onMount(() => {
     if (!container) return;
     
     // Create renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setClearColor(0x1a1a1a);
-    
-    // Add to DOM
+    renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(renderer.domElement);
     
-    // Handle resize
-    const handleResize = () => {
-      if (container && renderer && activeCamera) {
-        const width = container.clientWidth;
-        const height = container.clientHeight;
-        renderer.setSize(width, height);
-        
-        if (activeCamera) {
-          activeCamera.aspect = width / height;
-          activeCamera.updateProjectionMatrix();
-        }
-      }
-    };
+    // Set initial camera
+    activeCamera = cameraViews[0];
     
-    // Initial size
-    handleResize();
+    // Set up resize observer
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+    });
+    resizeObserver.observe(container);
     
-    // Listen for resizes
-    window.addEventListener('resize', handleResize);
+    // Start animation loop
+    animate();
     
-    // Initialize scene
-    threeScene = scene.getScene();
-    cameraViews = scene.getCameraViews();
-    updateActiveCameraView();
-    
-    // Start rendering if we have all required components
-    if (renderer && threeScene && activeCamera) {
-      startRendering();
-    }
-    
-    // Clean up
+    // Cleanup
     return () => {
-      window.removeEventListener('resize', handleResize);
+      resizeObserver.disconnect();
     };
   });
   
-  // Start the render loop
-  function startRendering() {
-    if (!renderer || !threeScene || !activeCamera) return;
+  // Animation loop
+  function animate() {
+    if (!renderer || !activeCamera) return;
     
-    // Set up orbit controls for design cameras
-    if (activeCameraType === CameraType.Design && !controls) {
-      controls = new OrbitControls(activeCamera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.1;
-      controls.rotateSpeed = 0.7;
-      controls.panSpeed = 0.7;
-      controls.zoomSpeed = 1.2;
-      controls.minDistance = 1;
-      controls.maxDistance = 100;
-      controls.target.set(0, 0, 0);
-    }
-    
-    // Animation loop
-    const animate = () => {
-      animationFrameId = requestAnimationFrame(animate);
-      
-      if (controls) {
-        controls.update();
-      }
-      
-      renderer.render(threeScene!, activeCamera!);
-    };
-    
-    animate();
+    requestAnimationFrame(animate);
+    renderer.render(scene.getScene(), activeCamera.getCamera());
   }
   
-  // Stop the render loop
-  function stopRendering() {
-    if (animationFrameId !== null) {
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = null;
-    }
+  // Handle resize
+  function handleResize() {
+    if (!container || !renderer || !activeCamera) return;
+    
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    
+    renderer.setSize(width, height);
+    activeCamera.updateAspectRatio(width / height);
   }
   
-  // Update the active camera view
-  function updateActiveCameraView() {
-    if (cameraViews.length > 0) {
-      const view = cameraViews[0];
-      activeCamera = view.getCamera();
-      activeCameraType = view.getCameraType();
-      
-      if (renderer && threeScene) {
-        startRendering();
-      }
-    }
-  }
-  
-  // Clean up on component destruction
+  // Cleanup
   onDestroy(() => {
-    stopRendering();
-    
-    if (controls) {
-      controls.dispose();
-      controls = null;
-    }
-    
     if (renderer) {
       renderer.dispose();
-      if (renderer.domElement.parentNode) {
-        renderer.domElement.parentNode.removeChild(renderer.domElement);
-      }
     }
   });
 </script>
