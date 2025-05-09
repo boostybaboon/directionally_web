@@ -2,12 +2,12 @@
   import { onMount, onDestroy } from 'svelte';
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import type { Scene } from '$lib/core/Scene';
+  import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
   import type { CameraView } from '$lib/core/interfaces/CameraView';
   import { CameraType } from '$lib/core/types/CameraType';
   
   // Props
-  export let scene: Scene;
+  export let scene: SceneViewer;
   export let cameraViews: CameraView[];
   
   // View state
@@ -28,7 +28,12 @@
     container.appendChild(renderer.domElement);
     
     // Set initial camera
+    console.log('View3D: cameraViews:', cameraViews);
     activeCamera = cameraViews[0];
+    console.log('View3D: activeCamera:', activeCamera);
+    
+    // Set up camera controls if it's a design camera
+    setupCameraControls();
     
     // Set up resize observer
     const resizeObserver = new ResizeObserver(() => {
@@ -42,14 +47,42 @@
     // Cleanup
     return () => {
       resizeObserver.disconnect();
+      if (controls) {
+        controls.dispose();
+      }
     };
   });
+  
+  // Set up camera controls
+  function setupCameraControls() {
+    if (!container || !activeCamera) return;
+    
+    // Only add controls for design cameras
+    if (activeCamera.getCameraType() === CameraType.Design) {
+      console.log('View3D: Setting up OrbitControls for design camera');
+      controls = new OrbitControls(activeCamera.getCamera(), container);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+    } else {
+      console.log('View3D: No controls for non-design camera');
+      if (controls) {
+        controls.dispose();
+        controls = null;
+      }
+    }
+  }
   
   // Animation loop
   function animate() {
     if (!renderer || !activeCamera) return;
     
     requestAnimationFrame(animate);
+    
+    // Update controls if they exist
+    if (controls) {
+      controls.update();
+    }
+    
     renderer.render(scene.getScene(), activeCamera.getCamera());
   }
   
@@ -59,15 +92,19 @@
     
     const width = container.clientWidth;
     const height = container.clientHeight;
+    const aspect = width / height;
     
     renderer.setSize(width, height);
-    activeCamera.updateAspectRatio(width / height);
+    activeCamera.updateAspectRatio(aspect);
   }
   
   // Cleanup
   onDestroy(() => {
     if (renderer) {
       renderer.dispose();
+    }
+    if (controls) {
+      controls.dispose();
     }
   });
 </script>

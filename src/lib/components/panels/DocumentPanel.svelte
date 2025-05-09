@@ -1,11 +1,14 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { DocumentManager } from '$lib/core/DocumentManager';
+  import { documentStore } from '$lib/stores/DocumentStore';
+  import { documentService } from '$lib/stores/DocumentService';
   import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
+  import { Scene } from '$lib/core/Scene';
   
   // Event dispatcher to communicate with parent components
   const dispatch = createEventDispatcher<{
-    documentCreated: { document: DocumentInterfaces };
+    documentCreated: { documentId: string };
     documentOpened: { document: DocumentInterfaces };
     documentSaved: { document: DocumentInterfaces };
   }>();
@@ -14,9 +17,13 @@
   function createDefaultDocument() {
     const documentManager = DocumentManager.getInstance();
     const document = documentManager.createDefaultDocument();
+    const documentId = documentStore.addDocument(document);
+    
+    // Set the scene in documentService
+    documentService.createEmptyScene(document.sceneViewer as unknown as Scene);
     
     // Dispatch event to notify parent components
-    dispatch('documentCreated', { document });
+    dispatch('documentCreated', { documentId });
   }
   
   function openDocument() {

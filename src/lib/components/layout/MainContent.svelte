@@ -1,50 +1,62 @@
 <script lang="ts">
-  import { onDestroy } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { viewService } from '$lib/stores/ViewStore.svelte';
-  import type { View } from '$lib/stores/ViewStore.svelte';
-  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
   import WelcomeView from '../views/WelcomeView.svelte';
   import View3D from '../views/View3D.svelte';
-  
-  // Subscribe to view store
+  import { documentStore } from '$lib/stores/DocumentStore';
+  import type { View, ViewState } from '$lib/stores/ViewStore.svelte';
+  import { createEventDispatcher } from 'svelte';
+
+  // Event dispatcher to communicate with parent components
+  const dispatch = createEventDispatcher<{
+    documentCreated: { documentId: string };
+  }>();
+
+  // View state
   let views: View[] = [];
   let activeViewId: string | null = null;
-  
-  const unsubscribe = viewService.subscribe(state => {
-    views = state.views;
-    activeViewId = state.activeViewId;
-  });
-  
-  // Handle document creation
-  function handleDocumentCreated(event: CustomEvent<{document: DocumentInterfaces}>) {
-    const { document } = event.detail;
-    
-    // Create a new 3D view
-    viewService.addView({
-      title: 'Scene View',
-      type: 'view3d',
-      data: { 
-        scene: document.sceneViewer.getScene(),
-        cameraViews: document.sceneViewer.getCameraViews()
-      }
+
+  // Initialize views
+  onMount(() => {
+    const unsubscribe = viewService.subscribe((state: ViewState) => {
+      views = state.views;
+      activeViewId = state.activeViewId;
     });
-  }
-  
+    return unsubscribe;
+  });
+
   // Handle tab click
   function handleTabClick(viewId: string) {
     viewService.setActiveView(viewId);
   }
-  
+
   // Handle tab close
   function handleTabClose(viewId: string, event: MouseEvent) {
     event.stopPropagation();
     viewService.removeView(viewId);
   }
-  
-  // Clean up
-  onDestroy(() => {
-    unsubscribe();
-  });
+
+  // Handle document creation
+  export function handleDocumentCreated(event: CustomEvent<{ documentId: string }>) {
+    console.log('MainContent: handleDocumentCreated called with id:', event.detail.documentId);
+    const document = documentStore.getDocument(event.detail.documentId);
+    console.log('MainContent: got document:', document);
+    if (!document) return;
+
+    const cameraViews = document.sceneViewer.getCameraViews();
+    console.log('MainContent: cameraViews:', cameraViews);
+
+    // Create a new 3D view for the document
+    const viewId = viewService.addView({
+      type: 'view3d',
+      title: '3D View',
+      data: {
+        scene: document.sceneViewer,
+        cameraViews: cameraViews
+      }
+    });
+    console.log('MainContent: created view with id:', viewId);
+  }
 </script>
 
 <div class="main-content">
@@ -88,7 +100,7 @@
         class:active={view.id === activeViewId}
       >
         {#if view.type === 'welcome'}
-          <WelcomeView />
+          <WelcomeView on:documentCreated={handleDocumentCreated} />
         {:else if view.type === 'view3d'}
           <View3D 
             scene={view.data.scene}
@@ -107,20 +119,18 @@
     flex-direction: column;
     background-color: #1e1e1e;
     color: #cccccc;
-    overflow: hidden;
   }
   
   .view-tabs {
     display: flex;
-    background-color: #252526;
-    border-bottom: 1px solid #333333;
+    background-color: #2d2d2d;
+    border-bottom: 1px solid #1e1e1e;
     overflow-x: auto;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none;
   }
   
   .view-tabs::-webkit-scrollbar {
-    display: none; /* Chrome, Safari, Opera */
+    display: none;
   }
   
   .tab {
@@ -128,36 +138,47 @@
     align-items: center;
     padding: 8px 16px;
     background-color: #2d2d2d;
-    border-right: 1px solid #333333;
+    color: #cccccc;
     cursor: pointer;
     user-select: none;
-    white-space: nowrap;
+    border-right: 1px solid #1e1e1e;
+    min-width: 120px;
+    max-width: 200px;
   }
   
   .tab.active {
     background-color: #1e1e1e;
-    border-bottom: 2px solid #007acc;
+    color: #ffffff;
+  }
+  
+  .tab-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    overflow: hidden;
   }
   
   .tab-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
     margin-right: 8px;
   }
   
   .close-button {
     background: none;
     border: none;
-    color: #888888;
+    color: #cccccc;
+    cursor: pointer;
     font-size: 1.2rem;
     padding: 0 4px;
-    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 4px;
   }
   
   .close-button:hover {
-    background-color: #333333;
     color: #ffffff;
   }
   
@@ -171,18 +192,12 @@
     position: absolute;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
+    width: 100%;
+    height: 100%;
     display: none;
   }
   
   .view.active {
     display: block;
-  }
-  
-  .tab-content {
-    display: flex;
-    align-items: center;
-    width: 100%;
   }
 </style>

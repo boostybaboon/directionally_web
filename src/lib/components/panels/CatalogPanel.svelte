@@ -1,7 +1,7 @@
 <script lang="ts">
   import { CatalogItemType } from '$lib/core/types/CatalogItemType';
   import { StandardCatalogBuilder } from '$lib/core/catalog/StandardCatalogBuilder';
-  import { documentService } from '$lib/stores/DocumentStore.svelte';
+  import { documentService } from '$lib/stores/DocumentService';
   import TreeView from '$lib/components/common/TreeView.svelte';
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
   import type { CommandExecutor } from '$lib/core/interfaces/CommandExecutor';

@@ -2,8 +2,14 @@
   import DocumentPanel from '../panels/DocumentPanel.svelte';
   import CatalogPanel from '../panels/CatalogPanel.svelte';
   import SceneGraphPanel from '../panels/SceneGraphPanel.svelte';
-  import { documentService } from '$lib/stores/DocumentStore.svelte';
+  import { documentStore } from '$lib/stores/DocumentStore';
   import type { Scene } from '$lib/core/Scene';
+  import { createEventDispatcher } from 'svelte';
+
+  // Event dispatcher to communicate with parent components
+  const dispatch = createEventDispatcher<{
+    documentCreated: { documentId: string };
+  }>();
 
   // Simple enum-like type for tab IDs
   type TabId = 'document' | 'catalog' | 'sceneGraph';
@@ -25,9 +31,14 @@
   }
   
   // Handle document events from DocumentPanel
-  function handleDocumentCreated(event: CustomEvent<{scene: Scene}>) {
-    const { scene } = event.detail;
-    documentService.createEmptyScene(scene);
+  function handleDocumentCreated(event: CustomEvent<{ documentId: string }>) {
+    console.log('LeftSidebar: handleDocumentCreated called with id:', event.detail.documentId);
+    const document = documentStore.getDocument(event.detail.documentId);
+    if (!document) return;
+    
+    // Forward the event to MainContent
+    console.log('LeftSidebar: forwarding documentCreated event');
+    dispatch('documentCreated', { documentId: event.detail.documentId });
     
     // Switch to scene graph view after creating document
     switchTab('sceneGraph');

@@ -18,4 +18,9 @@ export class SingleCameraView implements CameraView {
     public getCameraType(): CameraType {
         return this.cameraType;
     }
+
+    public updateAspectRatio(aspect: number): void {
+        this.camera.aspect = aspect;
+        this.camera.updateProjectionMatrix();
+    }
 }
