@@ -1,18 +1,33 @@
 <script lang="ts">
-  import { documentService } from '$lib/stores/DocumentService';
+  import { documentStore } from '$lib/stores/DocumentStore';
+  import type { CommandExecutor } from '$lib/core/interfaces/CommandExecutor';
+  
+  function isCommandExecutor(obj: unknown): obj is CommandExecutor {
+    return obj !== null && 
+           typeof obj === 'object' && 
+           'execute' in obj && 
+           'undo' in obj && 
+           'redo' in obj;
+  }
   
   function handleUndo() {
-    documentService.commandExecutor?.undo();
+    const scene = $documentStore.activeDocument?.scene;
+    if (scene && isCommandExecutor(scene)) {
+      scene.undo();
+    }
   }
   
   function handleRedo() {
-    documentService.commandExecutor?.redo();
+    const scene = $documentStore.activeDocument?.scene;
+    if (scene && isCommandExecutor(scene)) {
+      scene.redo();
+    }
   }
 </script>
 
 <div class="toolbar">
-  <button on:click={handleUndo} title="Undo">↩</button>
-  <button on:click={handleRedo} title="Redo">↪</button>
+  <button on:click={handleUndo} title="Undo" disabled={!$documentStore.activeDocument?.scene}>↩</button>
+  <button on:click={handleRedo} title="Redo" disabled={!$documentStore.activeDocument?.scene}>↪</button>
 </div>
 
 <style>
@@ -31,7 +46,12 @@
     cursor: pointer;
   }
   
-  button:hover {
+  button:hover:not(:disabled) {
     background: #3d3d3d;
+  }
+
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 </style> 

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { CatalogManager } from '$lib/core/CatalogManager';
   import type { CatalogItem } from '$lib/core/interfaces/Catalog';
-  import { documentService } from '$lib/stores/DocumentService';
+  import { documentStore } from '$lib/stores/DocumentStore';
 
   // Get the standard catalog
   const catalogManager = CatalogManager.getInstance();
@@ -40,14 +40,14 @@
 
   // Handle item click
   function handleItemClick(item: CatalogItem) {
-    const commandExecutor = documentService.commandExecutor;
+    const commandExecutor = $documentStore.activeDocument?.scene;
     
     // Check if we have an active document
     if (commandExecutor) {
       // Create the command and execute it
       const command = item.createCommand();
       commandExecutor.execute(command);
-      documentService.markAsModified();
+      documentStore.markAsModified();
       
       // Provide feedback
       console.log(`Added ${item.name} to scene`);

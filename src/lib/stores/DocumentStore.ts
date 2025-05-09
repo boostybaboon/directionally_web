@@ -1,19 +1,41 @@
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
+import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
+
+interface ActiveDocument {
+    id: string | null;
+    scene: SceneViewer | null;
+    name: string;
+    isModified: boolean;
+}
 
 interface DocumentState {
     documents: Map<string, DocumentInterfaces>;
-    activeDocumentId: string | null;
+    activeDocument: ActiveDocument;
 }
 
+const initialState: DocumentState = {
+    documents: new Map(),
+    activeDocument: {
+        id: null,
+        scene: null,
+        name: 'Untitled',
+        isModified: false
+    }
+};
+
 function createDocumentStore() {
-    const { subscribe, set, update } = writable<DocumentState>({
-        documents: new Map(),
-        activeDocumentId: null
-    });
+    const store = writable<DocumentState>(initialState);
+    const { subscribe, set, update } = store;
+
+    // Create derived stores
+    const activeDocument = derived(store, $store => $store.activeDocument);
+    const activeScene = derived(store, $store => $store.activeDocument.scene);
 
     return {
         subscribe,
+        
+        // Document collection management
         addDocument: (document: DocumentInterfaces) => {
             const id = crypto.randomUUID();
             update(state => {
@@ -21,34 +43,83 @@ function createDocumentStore() {
                 newDocuments.set(id, document);
                 return {
                     documents: newDocuments,
-                    activeDocumentId: id
+                    activeDocument: {
+                        id,
+                        scene: document.sceneViewer,
+                        name: 'Untitled',
+                        isModified: false
+                    }
                 };
             });
             return id;
         },
+
         removeDocument: (id: string) => {
             update(state => {
                 const newDocuments = new Map(state.documents);
                 newDocuments.delete(id);
+                const newActiveDocument = state.activeDocument.id === id 
+                    ? initialState.activeDocument 
+                    : state.activeDocument;
                 return {
                     documents: newDocuments,
-                    activeDocumentId: state.activeDocumentId === id ? null : state.activeDocumentId
+                    activeDocument: newActiveDocument
                 };
             });
         },
+
+        // Active document management
         setActiveDocument: (id: string) => {
+            update(state => {
+                const document = state.documents.get(id);
+                if (!document) return state;
+                
+                return {
+                    ...state,
+                    activeDocument: {
+                        id,
+                        scene: document.sceneViewer,
+                        name: 'Untitled', // TODO: Get name from document
+                        isModified: false
+                    }
+                };
+            });
+        },
+
+        // Document state management
+        markAsModified: () => {
             update(state => ({
                 ...state,
-                activeDocumentId: id
+                activeDocument: {
+                    ...state.activeDocument,
+                    isModified: true
+                }
             }));
         },
+
+        saveDocument: () => {
+            update(state => ({
+                ...state,
+                activeDocument: {
+                    ...state.activeDocument,
+                    isModified: false
+                }
+            }));
+            return true;
+        },
+
+        // Getters
         getDocument: (id: string) => {
             let result: DocumentInterfaces | undefined;
             subscribe(state => {
                 result = state.documents.get(id);
             })();
             return result;
-        }
+        },
+
+        // Expose derived stores
+        activeDocument,
+        activeScene
     };
 }
 

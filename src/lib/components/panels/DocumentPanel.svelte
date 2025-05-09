@@ -2,9 +2,11 @@
   import { createEventDispatcher } from 'svelte';
   import { DocumentManager } from '$lib/core/DocumentManager';
   import { documentStore } from '$lib/stores/DocumentStore';
-  import { documentService } from '$lib/stores/DocumentService';
   import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
-  import { Scene } from '$lib/core/Scene';
+  
+  // Subscribe to derived stores
+  $: activeDocument = $documentStore.activeDocument;
+  $: activeScene = activeDocument?.scene;
   
   // Event dispatcher to communicate with parent components
   const dispatch = createEventDispatcher<{
@@ -19,9 +21,6 @@
     const document = documentManager.createDefaultDocument();
     const documentId = documentStore.addDocument(document);
     
-    // Set the scene in documentService
-    documentService.createEmptyScene(document.sceneViewer as unknown as Scene);
-    
     // Dispatch event to notify parent components
     dispatch('documentCreated', { documentId });
   }
@@ -32,6 +31,7 @@
   }
   
   function saveDocument() {
+    documentStore.saveDocument();
     // In a real implementation, this would save the current scene
     alert('Saving document... (Not implemented)');
   }
@@ -48,7 +48,7 @@
       <span class="icon">📂</span> Open Document
     </button>
     
-    <button class="action-button" on:click={saveDocument}>
+    <button class="action-button" on:click={saveDocument} disabled={!activeDocument.id}>
       <span class="icon">💾</span> Save Document
     </button>
   </div>
@@ -91,6 +91,11 @@
   
   .action-button:hover {
     background-color: #4c4c4c;
+  }
+  
+  .action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
   
   .icon {
