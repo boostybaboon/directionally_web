@@ -1,15 +1,14 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
   import { DocumentManager } from '$lib/core/DocumentManager';
   import { getDocument, setDocument } from '$lib/stores/DocumentStore.svelte';
   import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
   
-  // Event dispatcher to communicate with parent components
-  const dispatch = createEventDispatcher<{
-    documentCreated: { document: DocumentInterfaces };
-    documentOpened: { document: DocumentInterfaces };
-    documentSaved: { document: DocumentInterfaces };
-  }>();
+  // Define bindable events using $props
+  let { 
+    onDocumentCreated = $bindable<(document: DocumentInterfaces) => void>(),
+    onDocumentOpened = $bindable<(document: DocumentInterfaces) => void>(),
+    onDocumentSaved = $bindable<(document: DocumentInterfaces) => void>()
+  } = $props();
   
   // Document management functionality
   function createDefaultDocument() {
@@ -17,8 +16,8 @@
     const document = documentManager.createDefaultDocument();
     setDocument(document);
     
-    // Dispatch event to notify parent components
-    dispatch('documentCreated', { document });
+    // Call the bindable event handler
+    onDocumentCreated(document);
   }
   
   function openDocument() {
@@ -31,6 +30,7 @@
     if (document) {
       // In a real implementation, this would save the current scene
       alert('Saving document... (Not implemented)');
+      onDocumentSaved(document);
     }
   }
 </script>
@@ -38,15 +38,15 @@
 <div class="document-panel">
   <div class="action-section">
     <h3>Document Actions</h3>
-    <button class="action-button" on:click={createDefaultDocument}>
+    <button class="action-button" onclick={createDefaultDocument}>
       <span class="icon">📝</span> Default Document
     </button>
     
-    <button class="action-button" on:click={openDocument}>
+    <button class="action-button" onclick={openDocument}>
       <span class="icon">📂</span> Open Document
     </button>
     
-    <button class="action-button" on:click={saveDocument} disabled={!getDocument()}>
+    <button class="action-button" onclick={saveDocument} disabled={!getDocument()}>
       <span class="icon">💾</span> Save Document
     </button>
   </div>

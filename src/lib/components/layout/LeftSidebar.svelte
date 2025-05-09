@@ -30,12 +30,12 @@
   }
   
   // Handle document events from DocumentPanel
-  function handleDocumentCreated(event: CustomEvent<{ document: DocumentInterfaces }>) {
-    console.log('LeftSidebar: handleDocumentCreated called with document:', event.detail.document);
+  function handleDocumentCreated(document: DocumentInterfaces) {
+    console.log('LeftSidebar: handleDocumentCreated called with document:', document);
     
     // Forward the event to MainContent
     console.log('LeftSidebar: forwarding documentCreated event');
-    dispatch('documentCreated', { document: event.detail.document });
+    dispatch('documentCreated', { document });
     
     // Switch to scene graph view after creating document
     switchTab('sceneGraph');
@@ -48,7 +48,7 @@
       <button 
         class="tab-button" 
         class:active={activeTab === tab.id}
-        on:click={() => switchTab(tab.id)} 
+        onclick={() => switchTab(tab.id)} 
         title={tab.title}
       >
         <span class="icon">{tab.icon}</span>
@@ -59,7 +59,7 @@
   <div class="tab-content">
     {#if activeTab === 'document'}
       <div class="panel-header">Document</div>
-      <DocumentPanel on:documentCreated={handleDocumentCreated} />
+      <DocumentPanel onDocumentCreated={handleDocumentCreated} />
     {:else if activeTab === 'catalog'}
       <div class="panel-header">Catalog</div>
       <CatalogPanel />
