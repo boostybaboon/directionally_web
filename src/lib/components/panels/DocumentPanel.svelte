@@ -20,7 +20,7 @@
     const documentId = documentStore.addDocument(document);
     
     // Set the scene in documentService
-    documentService.createDefaultDocument(document.sceneViewer as unknown as Scene);
+    documentService.createEmptyScene(document.sceneViewer as unknown as Scene);
     
     // Dispatch event to notify parent components
     dispatch('documentCreated', { documentId });

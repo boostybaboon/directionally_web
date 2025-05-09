@@ -59,7 +59,7 @@ export const documentService = {
   },
 
   // Document management functions
-  createDefaultDocument(scene: Scene) {
+  createEmptyScene(scene: Scene) {
     store.update(state => ({
       ...state,
       scene,
