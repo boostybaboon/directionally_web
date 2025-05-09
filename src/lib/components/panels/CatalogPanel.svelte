@@ -1,7 +1,7 @@
 <script lang="ts">
   import { CatalogManager } from '$lib/core/CatalogManager';
   import type { CatalogItem } from '$lib/core/interfaces/Catalog';
-  import { documentStore } from '$lib/stores/DocumentStore';
+  import { getDocument } from '$lib/stores/DocumentStore.svelte';
 
   // Get the standard catalog
   const catalogManager = CatalogManager.getInstance();
@@ -40,13 +40,12 @@
 
   // Handle item click
   function handleItemClick(item: CatalogItem) {
-    const document = $documentStore;
+    const document = getDocument();
     
     if (document) {
       // Create the command and execute it
       const command = item.createCommand();
       document.commandExecutor.execute(command);
-      documentStore.markAsModified();
       
       // Provide feedback
       console.log(`Added ${item.name} to scene`);

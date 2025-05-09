@@ -1,7 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   import { DocumentManager } from '$lib/core/DocumentManager';
-  import { documentStore } from '$lib/stores/DocumentStore';
+  import { getDocument, setDocument } from '$lib/stores/DocumentStore.svelte';
   import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
   
   // Event dispatcher to communicate with parent components
@@ -15,7 +15,7 @@
   function createDefaultDocument() {
     const documentManager = DocumentManager.getInstance();
     const document = documentManager.createDefaultDocument();
-    documentStore.setDocument(document);
+    setDocument(document);
     
     // Dispatch event to notify parent components
     dispatch('documentCreated', { document });
@@ -27,9 +27,8 @@
   }
   
   function saveDocument() {
-    const document = $documentStore;
+    const document = getDocument();
     if (document) {
-      documentStore.markAsModified();
       // In a real implementation, this would save the current scene
       alert('Saving document... (Not implemented)');
     }
@@ -47,7 +46,7 @@
       <span class="icon">📂</span> Open Document
     </button>
     
-    <button class="action-button" on:click={saveDocument} disabled={!$documentStore}>
+    <button class="action-button" on:click={saveDocument} disabled={!getDocument()}>
       <span class="icon">💾</span> Save Document
     </button>
   </div>

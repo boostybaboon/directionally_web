@@ -1,7 +1,7 @@
 <script lang="ts">
   import TreeView from '$lib/components/common/TreeView.svelte';
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
-  import { documentStore } from '$lib/stores/DocumentStore';
+  import { getDocument } from '$lib/stores/DocumentStore.svelte';
   import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
   import * as THREE from 'three';
   
@@ -94,7 +94,7 @@
   }
 
   // Reactive scene graph updates
-  $: sceneGraph = updateSceneGraph($documentStore?.sceneViewer ?? null);
+  $: sceneGraph = updateSceneGraph(getDocument()?.sceneViewer ?? null);
 </script>
 
 <div class="scene-graph-panel">

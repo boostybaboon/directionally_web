@@ -3,7 +3,6 @@
   import { viewService } from '$lib/stores/ViewStore.svelte';
   import WelcomeView from '../views/WelcomeView.svelte';
   import View3D from '../views/View3D.svelte';
-  import { documentStore } from '$lib/stores/DocumentStore';
   import type { View, ViewState } from '$lib/stores/ViewStore.svelte';
   import { createEventDispatcher } from 'svelte';
   import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';

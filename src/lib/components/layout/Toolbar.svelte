@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { documentStore } from '$lib/stores/DocumentStore';
+  import { getDocument } from '$lib/stores/DocumentStore.svelte';
   
   function handleUndo() {
-    const document = $documentStore;
+    const document = getDocument();
     if (document) {
       document.commandExecutor.undo();
     }
   }
   
   function handleRedo() {
-    const document = $documentStore;
+    const document = getDocument();
     if (document) {
       document.commandExecutor.redo();
     }
@@ -17,8 +17,8 @@
 </script>
 
 <div class="toolbar">
-  <button on:click={handleUndo} title="Undo" disabled={!$documentStore?.sceneViewer}>↩</button>
-  <button on:click={handleRedo} title="Redo" disabled={!$documentStore?.sceneViewer}>↪</button>
+  <button on:click={handleUndo} title="Undo" disabled={!getDocument()}>↩</button>
+  <button on:click={handleRedo} title="Redo" disabled={!getDocument()}>↪</button>
 </div>
 
 <style>
