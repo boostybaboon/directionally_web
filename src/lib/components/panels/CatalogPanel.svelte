@@ -1,8 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
   import { CatalogManager } from '$lib/core/CatalogManager';
   import type { CatalogItem } from '$lib/core/interfaces/Catalog';
-  import { CatalogItemType } from '$lib/core/types/CatalogItemType';
   import { documentService } from '$lib/stores/DocumentService';
 
   // Get the standard catalog
@@ -78,7 +76,13 @@
         </h3>
         <div class="catalog-items">
           {#each items as item}
-            <div class="catalog-item" on:click={() => handleItemClick(item)}>
+            <div 
+              class="catalog-item" 
+              on:click={() => handleItemClick(item)}
+              on:keydown={(e) => e.key === 'Enter' && handleItemClick(item)}
+              role="button"
+              tabindex="0"
+            >
               <div class="item-preview">
                 <!-- TODO: Add preview rendering -->
               </div>
