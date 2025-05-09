@@ -5,6 +5,7 @@ export interface View {
   title: string;
   type: 'welcome' | 'view3d';
   data?: any;
+  closable: boolean;
 }
 
 export interface ViewState {
@@ -13,11 +14,14 @@ export interface ViewState {
 }
 
 const initialState: ViewState = {
-  views: [{
-    id: 'welcome',
-    title: 'Welcome',
-    type: 'welcome'
-  }],
+  views: [
+    {
+      id: 'welcome',
+      type: 'welcome',
+      title: 'Welcome',
+      closable: true
+    }
+  ],
   activeViewId: 'welcome'
 };
 

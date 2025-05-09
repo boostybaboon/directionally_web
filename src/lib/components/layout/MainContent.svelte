@@ -4,17 +4,12 @@
   import WelcomeView from '../views/WelcomeView.svelte';
   import View3D from '../views/View3D.svelte';
   import type { View, ViewState } from '$lib/stores/ViewStore.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { onDocumentCreated } from '$lib/stores/DocumentStore.svelte';
   import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
 
-  // Event dispatcher to communicate with parent components
-  const dispatch = createEventDispatcher<{
-    documentCreated: { document: DocumentInterfaces };
-  }>();
-
   // View state
-  let views: View[] = [];
-  let activeViewId: string | null = null;
+  let views = $state<View[]>([]);
+  let activeViewId = $state<string | null>(null);
 
   // Initialize views
   onMount(() => {
@@ -36,26 +31,26 @@
     viewService.removeView(viewId);
   }
 
-  // Handle document creation
-  export function handleDocumentCreated(event: CustomEvent<{ document: DocumentInterfaces }>) {
-    console.log('MainContent: handleDocumentCreated called with document:', event.detail.document);
-    const document = event.detail.document;
-    console.log('MainContent: got document:', document);
+  // Subscribe to document creation
+  onDocumentCreated((document: DocumentInterfaces) => {
+    console.log('MainContent: document created:', $inspect(document));
 
     const cameraViews = document.sceneViewer.getCameraViews();
-    console.log('MainContent: cameraViews:', cameraViews);
+    console.log('MainContent: cameraViews:', $inspect(cameraViews));
 
     // Create a new 3D view for the document
     const viewId = viewService.addView({
       type: 'view3d',
       title: '3D View',
+      closable: true,
       data: {
         scene: document.sceneViewer,
         cameraViews: cameraViews
       }
     });
     console.log('MainContent: created view with id:', viewId);
-  }
+    viewService.setActiveView(viewId);
+  });
 </script>
 
 <div class="main-content">
@@ -64,8 +59,8 @@
       <div 
         class="tab" 
         class:active={view.id === activeViewId}
-        on:click={() => handleTabClick(view.id)}
-        on:keydown={(e) => {
+        onclick={() => handleTabClick(view.id)}
+        onkeydown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             handleTabClick(view.id);
@@ -77,10 +72,10 @@
       >
         <div class="tab-content">
           <span class="tab-title">{view.title}</span>
-          {#if view.id !== 'welcome'}
+          {#if view.closable}
             <button 
               class="close-button"
-              on:click={(e) => handleTabClose(view.id, e)}
+              onclick={(e) => handleTabClose(view.id, e)}
               title="Close"
               type="button"
             >
@@ -99,7 +94,7 @@
         class:active={view.id === activeViewId}
       >
         {#if view.type === 'welcome'}
-          <WelcomeView on:documentCreated={handleDocumentCreated} />
+          <WelcomeView />
         {:else if view.type === 'view3d'}
           <View3D 
             scene={view.data.scene}

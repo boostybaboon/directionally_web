@@ -1,36 +1,31 @@
 <script lang="ts">
   import { DocumentManager } from '$lib/core/DocumentManager';
-  import { getDocument, setDocument } from '$lib/stores/DocumentStore.svelte';
+  import { 
+    getDocument, 
+    createDocument, 
+    openDocument as openDocumentStore, 
+    saveDocument 
+  } from '$lib/stores/DocumentStore.svelte';
   import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
-  
-  // Define bindable events using $props
-  let { 
-    onDocumentCreated = $bindable<(document: DocumentInterfaces) => void>(),
-    onDocumentOpened = $bindable<(document: DocumentInterfaces) => void>(),
-    onDocumentSaved = $bindable<(document: DocumentInterfaces) => void>()
-  } = $props();
   
   // Document management functionality
   function createDefaultDocument() {
     const documentManager = DocumentManager.getInstance();
     const document = documentManager.createDefaultDocument();
-    setDocument(document);
-    
-    // Call the bindable event handler
-    onDocumentCreated(document);
+    createDocument(document);
   }
   
-  function openDocument() {
+  function handleOpenDocument() {
     // In a real implementation, this would open a file dialog
     alert('Opening document... (Not implemented)');
   }
   
-  function saveDocument() {
+  function handleSaveDocument() {
     const document = getDocument();
     if (document) {
       // In a real implementation, this would save the current scene
       alert('Saving document... (Not implemented)');
-      onDocumentSaved(document);
+      saveDocument();
     }
   }
 </script>
@@ -42,11 +37,11 @@
       <span class="icon">📝</span> Default Document
     </button>
     
-    <button class="action-button" onclick={openDocument}>
+    <button class="action-button" onclick={handleOpenDocument}>
       <span class="icon">📂</span> Open Document
     </button>
     
-    <button class="action-button" onclick={saveDocument} disabled={!getDocument()}>
+    <button class="action-button" onclick={handleSaveDocument} disabled={!getDocument()}>
       <span class="icon">💾</span> Save Document
     </button>
   </div>

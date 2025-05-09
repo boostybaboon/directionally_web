@@ -59,7 +59,7 @@
   <div class="tab-content">
     {#if activeTab === 'document'}
       <div class="panel-header">Document</div>
-      <DocumentPanel onDocumentCreated={handleDocumentCreated} />
+      <DocumentPanel />
     {:else if activeTab === 'catalog'}
       <div class="panel-header">Catalog</div>
       <CatalogPanel />

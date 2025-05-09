@@ -1,18 +1,85 @@
 import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
 
-// The main document state
-let document = $state<DocumentInterfaces | null>(null);
+// Document state
+let currentDocument = $state<DocumentInterfaces | null>(null);
+let isModified = $state(false);
 
-// Actions
-export function setDocument(newDocument: DocumentInterfaces) {
-    document = newDocument;
-}
+// Event state
+let documentCreated = $state<DocumentInterfaces | null>(null);
+let documentOpened = $state<DocumentInterfaces | null>(null);
+let documentSaved = $state<DocumentInterfaces | null>(null);
 
-export function clearDocument() {
-    document = null;
-}
-
-// Export functions to access the state
+// Document state management
 export function getDocument(): DocumentInterfaces | null {
-    return document;
+  return currentDocument;
+}
+
+export function setDocument(document: DocumentInterfaces) {
+  currentDocument = document;
+  isModified = false;
+}
+
+export function markAsModified() {
+  isModified = true;
+}
+
+// Document event management
+export function createDocument(document: DocumentInterfaces) {
+  currentDocument = document;
+  documentCreated = document;
+  isModified = false;
+}
+
+export function openDocument(document: DocumentInterfaces) {
+  currentDocument = document;
+  documentOpened = document;
+  isModified = false;
+}
+
+export function saveDocument() {
+  if (currentDocument) {
+    documentSaved = currentDocument;
+    isModified = false;
+  }
+}
+
+// Event subscriptions
+export function onDocumentCreated(callback: (document: DocumentInterfaces) => void) {
+  $effect(() => {
+    if (documentCreated) {
+      callback(documentCreated);
+      documentCreated = null; // Reset after handling
+    }
+  });
+}
+
+export function onDocumentOpened(callback: (document: DocumentInterfaces) => void) {
+  $effect(() => {
+    if (documentOpened) {
+      callback(documentOpened);
+      documentOpened = null; // Reset after handling
+    }
+  });
+}
+
+export function onDocumentSaved(callback: (document: DocumentInterfaces) => void) {
+  $effect(() => {
+    if (documentSaved) {
+      callback(documentSaved);
+      documentSaved = null; // Reset after handling
+    }
+  });
+}
+
+// Document state subscriptions
+export function onDocumentChange(callback: (document: DocumentInterfaces | null) => void) {
+  $effect(() => {
+    callback(currentDocument);
+  });
+}
+
+export function onModificationChange(callback: (isModified: boolean) => void) {
+  $effect(() => {
+    callback(isModified);
+  });
 } 
