@@ -40,13 +40,12 @@
 
   // Handle item click
   function handleItemClick(item: CatalogItem) {
-    const commandExecutor = $documentStore.activeDocument?.scene;
+    const scene = $documentStore.activeDocument?.scene;
     
-    // Check if we have an active document
-    if (commandExecutor) {
+    if (scene) {
       // Create the command and execute it
       const command = item.createCommand();
-      commandExecutor.execute(command);
+      scene.execute(command);
       documentStore.markAsModified();
       
       // Provide feedback

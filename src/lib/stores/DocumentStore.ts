@@ -1,10 +1,11 @@
 import { writable, derived } from 'svelte/store';
 import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
 import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
+import type { CommandExecutor } from '$lib/core/interfaces/CommandExecutor';
 
 interface ActiveDocument {
     id: string | null;
-    scene: SceneViewer | null;
+    scene: SceneViewer & CommandExecutor | null;
     name: string;
     isModified: boolean;
 }
@@ -45,7 +46,7 @@ function createDocumentStore() {
                     documents: newDocuments,
                     activeDocument: {
                         id,
-                        scene: document.sceneViewer,
+                        scene: document.sceneViewer as SceneViewer & CommandExecutor,
                         name: 'Untitled',
                         isModified: false
                     }
@@ -78,7 +79,7 @@ function createDocumentStore() {
                     ...state,
                     activeDocument: {
                         id,
-                        scene: document.sceneViewer,
+                        scene: document.sceneViewer as SceneViewer & CommandExecutor,
                         name: 'Untitled', // TODO: Get name from document
                         isModified: false
                     }
