@@ -3,13 +3,19 @@ import type { CatalogItem } from '../interfaces/Catalog';
 import { CatalogItemType } from '../types/CatalogItemType';
 import { AddObject3D } from '../commands/AddObject3D';
 
+export interface CatalogItemMetadata {
+    category: string;
+    icon: string;
+    description: string;
+}
+
 export abstract class StandardCatalogItem implements CatalogItem {
     constructor(
         public id: string,
         public name: string,
         public type: CatalogItemType,
         protected object: THREE.Object3D,
-        public metadata: Record<string, any> = {}
+        public metadata: CatalogItemMetadata
     ) {}
 
     createCommand(): AddObject3D {

@@ -1,110 +1,63 @@
 <script lang="ts">
+  import { onMount } from 'svelte';
+  import { CatalogManager } from '$lib/core/CatalogManager';
+  import type { CatalogItem } from '$lib/core/interfaces/Catalog';
   import { CatalogItemType } from '$lib/core/types/CatalogItemType';
-  import { StandardCatalogBuilder } from '$lib/core/catalog/StandardCatalogBuilder';
   import { documentService } from '$lib/stores/DocumentService';
-  import TreeView from '$lib/components/common/TreeView.svelte';
-  import type { TreeNode } from '$lib/components/common/TreeView.svelte';
-  
-  // Create a standard catalog
-  const catalogBuilder = new StandardCatalogBuilder();
-  const catalog = catalogBuilder.build();
-  
-  // Create catalog tree structure from actual catalog items
-  const meshes = catalog.getItemsByType(CatalogItemType.Mesh);
-  const lights = catalog.getItemsByType(CatalogItemType.Light);
-  const cameras = catalog.getItemsByType(CatalogItemType.Camera);
-  
-  const catalogData: TreeNode[] = [
-    {
-      id: 'meshes',
-      label: 'Meshes',
-      icon: '📦',
-      children: meshes.map(item => ({
-        id: item.id,
-        label: item.name,
-        data: { catalogItem: item }
-      }))
-    },
-    {
-      id: 'lights',
-      label: 'Lights',
-      icon: '💡',
-      children: lights.map(item => ({
-        id: item.id,
-        label: item.name,
-        data: { catalogItem: item }
-      }))
-    },
-    {
-      id: 'cameras',
-      label: 'Cameras',
-      icon: '📷',
-      children: cameras.map(item => ({
-        id: item.id,
-        label: item.name,
-        data: { catalogItem: item }
-      }))
-    }
-  ];
 
-  // Set TreeView options
-  const treeOptions = {
-    selectable: true,
-    multiSelect: false,
-    initialExpanded: ['meshes', 'lights', 'cameras'] // Expand all categories by default
-  };
-  
-  // Handle item selection
-  function handleSelect(event: CustomEvent) {
-    const { currentNode } = event.detail;
-    if (currentNode && !currentNode.children && currentNode.data?.catalogItem) {
-      const item = currentNode.data.catalogItem;
-      const commandExecutor = documentService.commandExecutor;
+  // Get the standard catalog
+  const catalogManager = CatalogManager.getInstance();
+  const catalog = catalogManager.getStandardCatalog();
+
+  // Search state
+  let searchTerm = '';
+
+  // Group items by category
+  $: itemsByCategory = catalog.getItems().reduce((acc, item) => {
+    const category = item.metadata.category;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(item);
+    return acc;
+  }, {} as Record<string, CatalogItem[]>);
+
+  // Filter items based on search
+  $: filteredItems = searchTerm 
+    ? catalog.getItems().filter(item => 
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.metadata.description.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : catalog.getItems();
+
+  // Group filtered items by category
+  $: filteredItemsByCategory = filteredItems.reduce((acc, item) => {
+    const category = item.metadata.category;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(item);
+    return acc;
+  }, {} as Record<string, CatalogItem[]>);
+
+  // Handle item click
+  function handleItemClick(item: CatalogItem) {
+    const commandExecutor = documentService.commandExecutor;
+    
+    // Check if we have an active document
+    if (commandExecutor) {
+      // Create the command and execute it
+      const command = item.createCommand();
+      commandExecutor.execute(command);
+      documentService.markAsModified();
       
-      // Check if we have an active document
-      if (commandExecutor) {
-        // Create the command and execute it
-        const command = item.createCommand();
-        commandExecutor.execute(command);
-        documentService.markAsModified();
-        
-        // Provide feedback
-        console.log(`Added ${item.name} to scene`);
-      } else {
-        // No active document
-        alert('Please create a new document first');
-      }
+      // Provide feedback
+      console.log(`Added ${item.name} to scene`);
+    } else {
+      // No active document
+      alert('Please create a new document first');
     }
   }
-  
-  let searchTerm = '';
-  
-  // Filter catalog items based on search term
-  function filterCatalog(nodes: TreeNode[], term: string): TreeNode[] {
-    if (!term) return nodes;
-    
-    return nodes
-      .map(node => {
-        if (node.label.toLowerCase().includes(term.toLowerCase())) {
-          return node;
-        }
-        
-        if (node.children) {
-          const filteredChildren = filterCatalog(node.children, term);
-          if (filteredChildren.length > 0) {
-            return {
-              ...node,
-              children: filteredChildren
-            };
-          }
-        }
-        
-        return null;
-      })
-      .filter((node): node is TreeNode => node !== null);
-  }
-  
-  $: filteredCatalog = filterCatalog(catalogData, searchTerm);
 </script>
 
 <div class="catalog-panel">
@@ -115,13 +68,27 @@
       bind:value={searchTerm}
     />
   </div>
-  
+
   <div class="catalog-content">
-    <TreeView 
-      nodes={filteredCatalog} 
-      options={treeOptions}
-      onselect={handleSelect}
-    />
+    {#each Object.entries(filteredItemsByCategory) as [category, items]}
+      <div class="catalog-section">
+        <h3>
+          <span class="category-icon">{items[0].metadata.icon}</span>
+          {category}
+        </h3>
+        <div class="catalog-items">
+          {#each items as item}
+            <div class="catalog-item" on:click={() => handleItemClick(item)}>
+              <div class="item-preview">
+                <!-- TODO: Add preview rendering -->
+              </div>
+              <div class="item-name">{item.name}</div>
+              <div class="item-description">{item.metadata.description}</div>
+            </div>
+          {/each}
+        </div>
+      </div>
+    {/each}
   </div>
 </div>
 
@@ -131,25 +98,82 @@
     flex-direction: column;
     height: 100%;
   }
-  
+
   .catalog-search {
-    padding: 16px;
-    border-bottom: 1px solid #1e1e1e;
+    padding: 1rem;
+    border-bottom: 1px solid #333;
   }
-  
+
   .catalog-search input {
     width: 100%;
-    padding: 6px;
-    background-color: #3c3c3c;
-    border: none;
-    border-radius: 2px;
-    color: #cccccc;
-    font-size: 0.9rem;
+    padding: 0.5rem;
+    background-color: #222;
+    border: 1px solid #333;
+    border-radius: 4px;
+    color: #fff;
   }
-  
+
   .catalog-content {
-    padding: 16px;
-    overflow-y: auto;
     flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .catalog-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .catalog-section h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    color: #888;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .category-icon {
+    font-size: 1.2rem;
+  }
+
+  .catalog-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .catalog-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid #333;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  .catalog-item:hover {
+    background-color: #333;
+  }
+
+  .item-preview {
+    width: 64px;
+    height: 64px;
+    background-color: #222;
+    margin-bottom: 0.5rem;
+    border-radius: 4px;
+  }
+
+  .item-name {
+    font-size: 0.8rem;
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .item-description {
+    font-size: 0.7rem;
+    color: #888;
+    text-align: center;
   }
 </style>
