@@ -17,8 +17,8 @@
 </script>
 
 <div class="toolbar">
-  <button on:click={handleUndo} title="Undo" disabled={!getDocument()}>↩</button>
-  <button on:click={handleRedo} title="Redo" disabled={!getDocument()}>↪</button>
+  <button onclick={handleUndo} title="Undo" disabled={!getDocument()}>↩</button>
+  <button onclick={handleRedo} title="Redo" disabled={!getDocument()}>↪</button>
 </div>
 
 <style>

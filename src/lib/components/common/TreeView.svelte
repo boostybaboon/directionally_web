@@ -119,8 +119,8 @@
         role="treeitem"
         aria-selected={selectedNodes.has(node.id)}
         tabindex={selectedNodes.has(node.id) ? 0 : -1}
-        on:click={() => toggleSelected(node.id, node)}
-        on:keydown={(e) => {
+        onclick={() => toggleSelected(node.id, node)}
+        onkeydown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
             toggleSelected(node.id, node);
@@ -132,8 +132,8 @@
             <button 
               class="expand-button" 
               type="button"
-              on:click={(e) => toggleExpanded(node.id, e)}
-              on:keydown={(e) => {
+              onclick={(e) => toggleExpanded(node.id, e)}
+              onkeydown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   toggleExpanded(node.id, e);
@@ -174,8 +174,8 @@
       role="treeitem"
       aria-selected={selectedNodes.has(node.id)}
       tabindex={selectedNodes.has(node.id) ? 0 : -1}
-      on:click={() => toggleSelected(node.id, node)}
-      on:keydown={(e) => {
+      onclick={() => toggleSelected(node.id, node)}
+      onkeydown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           toggleSelected(node.id, node);
@@ -187,8 +187,8 @@
           <button 
             class="expand-button" 
             type="button"
-            on:click={(e) => toggleExpanded(node.id, e)}
-            on:keydown={(e) => {
+            onclick={(e) => toggleExpanded(node.id, e)}
+            onkeydown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 toggleExpanded(node.id, e);

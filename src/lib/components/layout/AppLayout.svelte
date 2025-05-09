@@ -4,20 +4,7 @@
   import MainContent from './MainContent.svelte';
   import RightSidebar from './RightSidebar.svelte';
   import Toolbar from './Toolbar.svelte';
-  import { createEventDispatcher } from 'svelte';
   import { setupKeyboardShortcuts } from '$lib/ui/keyboard/KeyboardShortcuts';
-
-  const dispatch = createEventDispatcher<{
-    documentCreated: { documentId: string };
-  }>();
-
-  let mainContent: MainContent;
-
-  function handleDocumentCreated(event: CustomEvent<{ documentId: string }>) {
-    console.log('AppLayout: handleDocumentCreated called with id:', event.detail.documentId);
-    // Call MainContent's handler directly
-    mainContent.handleDocumentCreated(event);
-  }
 
   onMount(() => {
     setupKeyboardShortcuts();
@@ -28,8 +15,8 @@
   <div class="main-area">
     <Toolbar />
     <div class="content-area">
-      <LeftSidebar on:documentCreated={handleDocumentCreated} />
-      <MainContent bind:this={mainContent} />
+      <LeftSidebar />
+      <MainContent />
       <RightSidebar />
     </div>
   </div>

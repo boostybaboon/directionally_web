@@ -2,13 +2,8 @@
   import DocumentPanel from '../panels/DocumentPanel.svelte';
   import CatalogPanel from '../panels/CatalogPanel.svelte';
   import SceneGraphPanel from '../panels/SceneGraphPanel.svelte';
-  import { createEventDispatcher } from 'svelte';
+  import { createDocument } from '$lib/stores/DocumentStore.svelte';
   import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
-
-  // Event dispatcher to communicate with parent components
-  const dispatch = createEventDispatcher<{
-    documentCreated: { document: DocumentInterfaces };
-  }>();
 
   // Simple enum-like type for tab IDs
   type TabId = 'document' | 'catalog' | 'sceneGraph';
@@ -33,9 +28,8 @@
   function handleDocumentCreated(document: DocumentInterfaces) {
     console.log('LeftSidebar: handleDocumentCreated called with document:', document);
     
-    // Forward the event to MainContent
-    console.log('LeftSidebar: forwarding documentCreated event');
-    dispatch('documentCreated', { document });
+    // Use the store directly
+    createDocument(document);
     
     // Switch to scene graph view after creating document
     switchTab('sceneGraph');

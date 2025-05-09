@@ -1,6 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
-  const dispatch = createEventDispatcher();
+  // No imports needed
 </script>
 
 <div class="welcome-view">

@@ -6,10 +6,9 @@
     openDocument as openDocumentStore, 
     saveDocument 
   } from '$lib/stores/DocumentStore.svelte';
-  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
   
   // Document management functionality
-  function createDefaultDocument() {
+  function handleCreateDefaultDocument() {
     const documentManager = DocumentManager.getInstance();
     const document = documentManager.createDefaultDocument();
     createDocument(document);
@@ -33,7 +32,7 @@
 <div class="document-panel">
   <div class="action-section">
     <h3>Document Actions</h3>
-    <button class="action-button" onclick={createDefaultDocument}>
+    <button class="action-button" onclick={handleCreateDefaultDocument}>
       <span class="icon">📝</span> Default Document
     </button>
     

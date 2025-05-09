@@ -102,14 +102,14 @@
     <button 
       class="tool-button" 
       title="Expand All" 
-      on:click={() => treeOptions = { ...treeOptions, initialExpanded: expandAll(sceneGraph) }}
+      onclick={() => treeOptions = { ...treeOptions, initialExpanded: expandAll(sceneGraph) }}
     >
       📂
     </button>
     <button 
       class="tool-button" 
       title="Collapse All" 
-      on:click={() => treeOptions = { ...treeOptions, initialExpanded: [] }}
+      onclick={() => treeOptions = { ...treeOptions, initialExpanded: [] }}
     >
       📁
     </button>

@@ -2,7 +2,6 @@ import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces
 
 // Document state
 let currentDocument = $state<DocumentInterfaces | null>(null);
-let isModified = $state(false);
 
 // Event state
 let documentCreated = $state<DocumentInterfaces | null>(null);
@@ -16,30 +15,22 @@ export function getDocument(): DocumentInterfaces | null {
 
 export function setDocument(document: DocumentInterfaces) {
   currentDocument = document;
-  isModified = false;
-}
-
-export function markAsModified() {
-  isModified = true;
 }
 
 // Document event management
 export function createDocument(document: DocumentInterfaces) {
   currentDocument = document;
   documentCreated = document;
-  isModified = false;
 }
 
 export function openDocument(document: DocumentInterfaces) {
   currentDocument = document;
   documentOpened = document;
-  isModified = false;
 }
 
 export function saveDocument() {
   if (currentDocument) {
     documentSaved = currentDocument;
-    isModified = false;
   }
 }
 
@@ -77,9 +68,4 @@ export function onDocumentChange(callback: (document: DocumentInterfaces | null)
     callback(currentDocument);
   });
 }
-
-export function onModificationChange(callback: (isModified: boolean) => void) {
-  $effect(() => {
-    callback(isModified);
-  });
-} 
+ 

@@ -17,8 +17,8 @@
 <div class="right-sidebar" class:collapsed={!visible}>
   <button 
     class="sidebar-toggle" 
-    on:click={toggleVisibility}
-    on:keydown={handleKeyDown}
+    onclick={toggleVisibility}
+    onkeydown={handleKeyDown}
     aria-label={visible ? "Collapse panel" : "Expand panel"}
     type="button"
   >

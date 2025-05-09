@@ -76,8 +76,8 @@
           {#each items as item}
             <div 
               class="catalog-item" 
-              on:click={() => handleItemClick(item)}
-              on:keydown={(e) => e.key === 'Enter' && handleItemClick(item)}
+              onclick={() => handleItemClick(item)}
+              onkeydown={(e) => e.key === 'Enter' && handleItemClick(item)}
               role="button"
               tabindex="0"
             >
