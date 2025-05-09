@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { Command } from '../Command';
-import type { SceneChanger } from '../Scene';
+import type { SceneChanger } from '../interfaces/SceneChanger';
 
 export class AddPlaybackCamera implements Command {
     private camera: THREE.PerspectiveCamera;

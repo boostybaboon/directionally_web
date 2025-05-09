@@ -1,6 +1,5 @@
 import { Catalog } from './Catalog';
 import { StandardCatalogBuilder } from './catalog/StandardCatalogBuilder';
-import type { CatalogItem } from './interfaces/Catalog';
 
 export class CatalogManager {
     private static instance: CatalogManager;
