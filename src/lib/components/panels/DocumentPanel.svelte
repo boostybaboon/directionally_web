@@ -4,13 +4,9 @@
   import { documentStore } from '$lib/stores/DocumentStore';
   import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
   
-  // Subscribe to derived stores
-  $: activeDocument = $documentStore.activeDocument;
-  $: activeScene = activeDocument?.scene;
-  
   // Event dispatcher to communicate with parent components
   const dispatch = createEventDispatcher<{
-    documentCreated: { documentId: string };
+    documentCreated: { document: DocumentInterfaces };
     documentOpened: { document: DocumentInterfaces };
     documentSaved: { document: DocumentInterfaces };
   }>();
@@ -19,10 +15,10 @@
   function createDefaultDocument() {
     const documentManager = DocumentManager.getInstance();
     const document = documentManager.createDefaultDocument();
-    const documentId = documentStore.addDocument(document);
+    documentStore.setDocument(document);
     
     // Dispatch event to notify parent components
-    dispatch('documentCreated', { documentId });
+    dispatch('documentCreated', { document });
   }
   
   function openDocument() {
@@ -31,9 +27,12 @@
   }
   
   function saveDocument() {
-    documentStore.saveDocument();
-    // In a real implementation, this would save the current scene
-    alert('Saving document... (Not implemented)');
+    const document = $documentStore;
+    if (document) {
+      documentStore.markAsModified();
+      // In a real implementation, this would save the current scene
+      alert('Saving document... (Not implemented)');
+    }
   }
 </script>
 
@@ -48,7 +47,7 @@
       <span class="icon">📂</span> Open Document
     </button>
     
-    <button class="action-button" on:click={saveDocument} disabled={!activeDocument.id}>
+    <button class="action-button" on:click={saveDocument} disabled={!$documentStore}>
       <span class="icon">💾</span> Save Document
     </button>
   </div>

@@ -6,10 +6,11 @@
   import { documentStore } from '$lib/stores/DocumentStore';
   import type { View, ViewState } from '$lib/stores/ViewStore.svelte';
   import { createEventDispatcher } from 'svelte';
+  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
 
   // Event dispatcher to communicate with parent components
   const dispatch = createEventDispatcher<{
-    documentCreated: { documentId: string };
+    documentCreated: { document: DocumentInterfaces };
   }>();
 
   // View state
@@ -37,11 +38,10 @@
   }
 
   // Handle document creation
-  export function handleDocumentCreated(event: CustomEvent<{ documentId: string }>) {
-    console.log('MainContent: handleDocumentCreated called with id:', event.detail.documentId);
-    const document = documentStore.getDocument(event.detail.documentId);
+  export function handleDocumentCreated(event: CustomEvent<{ document: DocumentInterfaces }>) {
+    console.log('MainContent: handleDocumentCreated called with document:', event.detail.document);
+    const document = event.detail.document;
     console.log('MainContent: got document:', document);
-    if (!document) return;
 
     const cameraViews = document.sceneViewer.getCameraViews();
     console.log('MainContent: cameraViews:', cameraViews);

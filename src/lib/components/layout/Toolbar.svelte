@@ -1,33 +1,24 @@
 <script lang="ts">
   import { documentStore } from '$lib/stores/DocumentStore';
-  import type { CommandExecutor } from '$lib/core/interfaces/CommandExecutor';
-  
-  function isCommandExecutor(obj: unknown): obj is CommandExecutor {
-    return obj !== null && 
-           typeof obj === 'object' && 
-           'execute' in obj && 
-           'undo' in obj && 
-           'redo' in obj;
-  }
   
   function handleUndo() {
-    const scene = $documentStore.activeDocument?.scene;
-    if (scene && isCommandExecutor(scene)) {
-      scene.undo();
+    const document = $documentStore;
+    if (document) {
+      document.commandExecutor.undo();
     }
   }
   
   function handleRedo() {
-    const scene = $documentStore.activeDocument?.scene;
-    if (scene && isCommandExecutor(scene)) {
-      scene.redo();
+    const document = $documentStore;
+    if (document) {
+      document.commandExecutor.redo();
     }
   }
 </script>
 
 <div class="toolbar">
-  <button on:click={handleUndo} title="Undo" disabled={!$documentStore.activeDocument?.scene}>↩</button>
-  <button on:click={handleRedo} title="Redo" disabled={!$documentStore.activeDocument?.scene}>↪</button>
+  <button on:click={handleUndo} title="Undo" disabled={!$documentStore?.sceneViewer}>↩</button>
+  <button on:click={handleRedo} title="Redo" disabled={!$documentStore?.sceneViewer}>↪</button>
 </div>
 
 <style>

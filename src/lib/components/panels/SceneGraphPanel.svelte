@@ -94,7 +94,7 @@
   }
 
   // Reactive scene graph updates
-  $: sceneGraph = updateSceneGraph($documentStore.activeDocument?.scene);
+  $: sceneGraph = updateSceneGraph($documentStore?.sceneViewer ?? null);
 </script>
 
 <div class="scene-graph-panel">
