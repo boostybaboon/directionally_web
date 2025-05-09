@@ -3,7 +3,6 @@
   import CatalogPanel from '../panels/CatalogPanel.svelte';
   import SceneGraphPanel from '../panels/SceneGraphPanel.svelte';
   import { documentStore } from '$lib/stores/DocumentStore';
-  import type { Scene } from '$lib/core/Scene';
   import { createEventDispatcher } from 'svelte';
 
   // Event dispatcher to communicate with parent components

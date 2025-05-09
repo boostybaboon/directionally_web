@@ -21,10 +21,11 @@ export class SphereMeshItem extends StandardCatalogItem {
 }
 
 export class PlaneMeshItem extends StandardCatalogItem {
-    constructor(id: string, width: number = 1, height: number = 1) {
+    constructor(id: string, width: number = 10, height: number = 10) {
         const geometry = new THREE.PlaneGeometry(width, height);
         const material = new THREE.MeshStandardMaterial();
         const mesh = new THREE.Mesh(geometry, material);
+        mesh.rotation.x = -Math.PI / 2; // Rotate -90 degrees around X axis
         super(id, 'Plane', CatalogItemType.Mesh, mesh);
     }
 } 

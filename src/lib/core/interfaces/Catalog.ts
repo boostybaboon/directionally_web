@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import type { Command } from '../Command';
-import { CatalogItemType } from '../types/CatalogItemType';
 
 export interface CatalogItem {
     id: string;
@@ -12,11 +11,11 @@ export interface CatalogItem {
 }
 
 export interface Catalog {
-    items: CatalogItem[];
+    readonly items: Map<string, CatalogItem>;
     
     addItem(item: CatalogItem): void;
     removeItem(id: string): void;
     getItem(id: string): CatalogItem | undefined;
     getAllItems(): CatalogItem[];
-    getItemsByType(type: string): CatalogItem[];
+    getItemsByType(type: string): readonly CatalogItem[];
 } 

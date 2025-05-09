@@ -8,7 +8,8 @@ export abstract class StandardCatalogItem implements CatalogItem {
         public id: string,
         public name: string,
         public type: CatalogItemType,
-        protected object: THREE.Object3D
+        protected object: THREE.Object3D,
+        public metadata: Record<string, any> = {}
     ) {}
 
     createCommand(): AddObject3D {

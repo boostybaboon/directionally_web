@@ -4,7 +4,6 @@
   import { documentService } from '$lib/stores/DocumentService';
   import TreeView from '$lib/components/common/TreeView.svelte';
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
-  import type { CommandExecutor } from '$lib/core/interfaces/CommandExecutor';
   
   // Create a standard catalog
   const catalogBuilder = new StandardCatalogBuilder();

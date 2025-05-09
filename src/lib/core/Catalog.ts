@@ -1,16 +1,19 @@
-import * as THREE from 'three';
 import type { Catalog as ICatalog, CatalogItem } from './interfaces/Catalog';
 import { CatalogItemType } from './types/CatalogItemType';
 
 export class Catalog implements ICatalog {
-    private items: Map<string, CatalogItem> = new Map();
+    public readonly items: Map<string, CatalogItem> = new Map();
 
     public getItems(): readonly CatalogItem[] {
         return Array.from(this.items.values());
     }
 
-    public getItemById(id: string): CatalogItem | undefined {
+    public getItem(id: string): CatalogItem | undefined {
         return this.items.get(id);
+    }
+
+    public getAllItems(): CatalogItem[] {
+        return Array.from(this.items.values());
     }
 
     public getItemsByType(type: CatalogItemType): readonly CatalogItem[] {
