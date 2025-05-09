@@ -11,7 +11,8 @@ class MockCatalogItem implements CatalogItem {
         public id: string,
         public name: string,
         public type: CatalogItemType,
-        private object: THREE.Object3D
+        private object: THREE.Object3D,
+        public metadata: Record<string, any> = {}
     ) {}
 
     createCommand(): AddObject3D {
@@ -29,7 +30,7 @@ describe('Catalog', () => {
         const item = new MockCatalogItem('1', 'Test Mesh', CatalogItemType.Mesh, new THREE.Mesh());
 
         catalog.addItem(item);
-        expect(catalog.getItemById('1')).toBe(item);
+        expect(catalog.getItem('1')).toBe(item);
         expect(catalog.getItems()).toHaveLength(1);
     });
 
@@ -55,6 +56,6 @@ describe('Catalog', () => {
 
         catalog.removeItem('1');
         expect(catalog.getItems()).toHaveLength(0);
-        expect(catalog.getItemById('1')).toBeUndefined();
+        expect(catalog.getItem('1')).toBeUndefined();
     });
 }); 
