@@ -3,7 +3,7 @@
   import { getContext } from 'svelte';
   import WelcomeView from '../views/WelcomeView.svelte';
   import View3D from '../views/View3D.svelte';
-  import type { View, ViewState } from '$lib/types/view';
+  import type { View } from '$lib/types/view';
   import type { DocumentContext } from '$lib/types/document';
 
   // Get document context
