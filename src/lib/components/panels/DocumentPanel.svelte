@@ -11,24 +11,19 @@
     saveDocument: () => void;
   };
 
-  // Props
-  const { onCreateDocument, onOpenDocument } = $props<{
-    onCreateDocument: () => void;
-    onOpenDocument: () => void;
-  }>();
-
   // Get document context
-  const { currentDocument } = getContext<DocumentContext>('document');
+  const documentContext = getContext<DocumentContext>('document');
+  const { createDocument, openDocument } = documentContext;
 </script>
 
 <div class="document-panel">
   <div class="action-section">
     <h3>Document Actions</h3>
-    <button class="action-button" onclick={onCreateDocument}>
+    <button class="action-button" onclick={createDocument}>
       <span class="icon">📝</span> Default Document
     </button>
     
-    <button class="action-button" onclick={onOpenDocument}>
+    <button class="action-button" onclick={openDocument}>
       <span class="icon">📂</span> Open Document
     </button>
   </div>

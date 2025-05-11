@@ -8,7 +8,6 @@
 
   // Get document context
   const documentContext = getContext<DocumentContext>('document');
-  const { openDocument, createDocument } = documentContext;
 
   // Simple enum-like type for tab IDs
   type TabId = 'document' | 'catalog' | 'sceneGraph';
@@ -26,12 +25,6 @@
   // Handle tab click
   function handleTabClick(tab: TabId) {
     activeTab = tab;
-  }
-
-  // Handle document creation
-  function handleDocumentCreated() {
-    createDocument();
-    activeTab = 'sceneGraph';
   }
 
   onMount(() => {
@@ -66,10 +59,7 @@
   <div class="tab-content">
     {#if activeTab === 'document'}
       <div class="panel-header">Document</div>
-      <DocumentPanel 
-        onCreateDocument={handleDocumentCreated}
-        onOpenDocument={openDocument}
-      />
+      <DocumentPanel />
     {:else if activeTab === 'catalog'}
       <div class="panel-header">Catalog</div>
       <CatalogPanel />
