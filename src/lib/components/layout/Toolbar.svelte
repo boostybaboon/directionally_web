@@ -1,24 +1,26 @@
 <script lang="ts">
-  import { getDocument } from '$lib/stores/DocumentStore.svelte';
+  import { getContext } from 'svelte';
+  import type { DocumentContext } from '$lib/types/document';
+
+  // Get document context
+  const documentContext = getContext<DocumentContext>('document');
   
   function handleUndo() {
-    const document = getDocument();
-    if (document) {
-      document.commandExecutor.undo();
+    if (documentContext.currentDocument) {
+      documentContext.currentDocument.commandExecutor.undo();
     }
   }
   
   function handleRedo() {
-    const document = getDocument();
-    if (document) {
-      document.commandExecutor.redo();
+    if (documentContext.currentDocument) {
+      documentContext.currentDocument.commandExecutor.redo();
     }
   }
 </script>
 
 <div class="toolbar">
-  <button onclick={handleUndo} title="Undo" disabled={!getDocument()}>↩</button>
-  <button onclick={handleRedo} title="Redo" disabled={!getDocument()}>↪</button>
+  <button onclick={handleUndo} title="Undo" disabled={!documentContext.currentDocument}>↩</button>
+  <button onclick={handleRedo} title="Redo" disabled={!documentContext.currentDocument}>↪</button>
 </div>
 
 <style>

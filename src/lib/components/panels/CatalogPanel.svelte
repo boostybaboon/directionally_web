@@ -1,7 +1,14 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
   import { CatalogManager } from '$lib/core/CatalogManager';
   import type { CatalogItem } from '$lib/core/interfaces/Catalog';
-  import { getDocument } from '$lib/stores/DocumentStore.svelte';
+  import type { DocumentContext } from '$lib/types/document';
+
+  // Document context type
+
+
+  // Get document context
+  const { currentDocument } = getContext<DocumentContext>('document');
 
   // Get the standard catalog
   const catalogManager = CatalogManager.getInstance();
@@ -40,15 +47,9 @@
 
   // Handle item click
   function handleItemClick(item: CatalogItem) {
-    const document = getDocument();
-    
-    if (document) {
-      // Create the command and execute it
+    if (currentDocument) {
       const command = item.createCommand();
-      document.commandExecutor.execute(command);
-      
-      // Provide feedback
-      console.log(`Added ${item.name} to scene`);
+      currentDocument.commandExecutor.execute(command);
     } else {
       // No active document
       alert('Please create a new document first');

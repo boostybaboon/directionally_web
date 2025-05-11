@@ -7,20 +7,34 @@
   import { CameraType } from '$lib/core/types/CameraType';
   
   // Props
-  export let scene: SceneViewer;
-  export let cameraViews: CameraView[];
+  const { scene, cameraViews } = $props<{
+    scene: SceneViewer;
+    cameraViews: CameraView[];
+  }>();
   
   // View state
   let container: HTMLElement;
   let renderer: THREE.WebGLRenderer;
-  let activeCamera: CameraView;
-  let animationFrameId: number | null = null;
+  let activeCamera = $state<CameraView | null>(null);
   let controls: OrbitControls | null = null;
-  let activeCameraType: CameraType | null = null;
   
   // Initialize
   onMount(() => {
-    if (!container) return;
+    
+    if (!container) {
+      console.error('View3D: container is null');
+      return;
+    }
+    
+    if (!scene) {
+      console.error('View3D: scene is null');
+      return;
+    }
+    
+    if (!cameraViews || cameraViews.length === 0) {
+      console.error('View3D: no camera views available');
+      return;
+    }
     
     // Create renderer
     renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -28,9 +42,7 @@
     container.appendChild(renderer.domElement);
     
     // Set initial camera
-    console.log('View3D: cameraViews:', cameraViews);
     activeCamera = cameraViews[0];
-    console.log('View3D: activeCamera:', activeCamera);
     
     // Set up camera controls if it's a design camera
     setupCameraControls();
@@ -59,12 +71,10 @@
     
     // Only add controls for design cameras
     if (activeCamera.getCameraType() === CameraType.Design) {
-      console.log('View3D: Setting up OrbitControls for design camera');
       controls = new OrbitControls(activeCamera.getCamera(), container);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
     } else {
-      console.log('View3D: No controls for non-design camera');
       if (controls) {
         controls.dispose();
         controls = null;
@@ -110,7 +120,7 @@
 </script>
 
 <div class="view-3d" bind:this={container}>
-  {#if !activeCamera}
+  {#if activeCamera === null}
     <div class="placeholder-view">
       <p>No active camera</p>
     </div>

@@ -1,9 +1,21 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
   import TreeView from '$lib/components/common/TreeView.svelte';
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
-  import { getDocument } from '$lib/stores/DocumentStore.svelte';
+  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
   import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
   import * as THREE from 'three';
+  
+  // Document context type
+  type DocumentContext = {
+    currentDocument: DocumentInterfaces | null;
+    createDocument: () => void;
+    openDocument: () => void;
+    saveDocument: () => void;
+  };
+
+  // Get document context
+  const { currentDocument } = getContext<DocumentContext>('document');
   
   // Convert the scene hierarchy to a TreeNode structure
   function updateSceneGraph(sceneViewer: SceneViewer | null): TreeNode[] {
@@ -87,14 +99,13 @@
     const { currentNode } = event.detail;
     if (currentNode && currentNode.data && currentNode.data.object) {
       const object = currentNode.data.object as THREE.Object3D;
-      console.log('Selected object:', object);
       // Here you could dispatch an event or call a service to show properties
       // in the RightSidebar
     }
   }
 
   // Reactive scene graph updates
-  $: sceneGraph = updateSceneGraph(getDocument()?.sceneViewer ?? null);
+  $: sceneGraph = updateSceneGraph(currentDocument?.sceneViewer ?? null);
 </script>
 
 <div class="scene-graph-panel">

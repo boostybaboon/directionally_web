@@ -1,47 +1,35 @@
 <script lang="ts">
-  import { DocumentManager } from '$lib/core/DocumentManager';
-  import { 
-    getDocument, 
-    createDocument, 
-    openDocument as openDocumentStore, 
-    saveDocument 
-  } from '$lib/stores/DocumentStore.svelte';
-  
-  // Document management functionality
-  function handleCreateDefaultDocument() {
-    const documentManager = DocumentManager.getInstance();
-    const document = documentManager.createDefaultDocument();
-    createDocument(document);
-  }
-  
-  function handleOpenDocument() {
-    // In a real implementation, this would open a file dialog
-    alert('Opening document... (Not implemented)');
-  }
-  
-  function handleSaveDocument() {
-    const document = getDocument();
-    if (document) {
-      // In a real implementation, this would save the current scene
-      alert('Saving document... (Not implemented)');
-      saveDocument();
-    }
-  }
+  import { getContext } from 'svelte';
+  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
+  import type { DocumentContext } from '$lib/types/document';
+
+  // Document context type
+  type DocumentContext = {
+    currentDocument: DocumentInterfaces | null;
+    createDocument: () => void;
+    openDocument: () => void;
+    saveDocument: () => void;
+  };
+
+  // Props
+  const { onCreateDocument, onOpenDocument } = $props<{
+    onCreateDocument: () => void;
+    onOpenDocument: () => void;
+  }>();
+
+  // Get document context
+  const { currentDocument } = getContext<DocumentContext>('document');
 </script>
 
 <div class="document-panel">
   <div class="action-section">
     <h3>Document Actions</h3>
-    <button class="action-button" onclick={handleCreateDefaultDocument}>
+    <button class="action-button" onclick={onCreateDocument}>
       <span class="icon">📝</span> Default Document
     </button>
     
-    <button class="action-button" onclick={handleOpenDocument}>
+    <button class="action-button" onclick={onOpenDocument}>
       <span class="icon">📂</span> Open Document
-    </button>
-    
-    <button class="action-button" onclick={handleSaveDocument} disabled={!getDocument()}>
-      <span class="icon">💾</span> Save Document
     </button>
   </div>
   

@@ -1,11 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { getContext } from 'svelte';
   import { viewService } from '$lib/stores/ViewStore.svelte';
   import WelcomeView from '../views/WelcomeView.svelte';
   import View3D from '../views/View3D.svelte';
   import type { View, ViewState } from '$lib/stores/ViewStore.svelte';
-  import { onDocumentCreated } from '$lib/stores/DocumentStore.svelte';
-  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
+  import type { DocumentContext } from '$lib/types/document';
+
+  // Get document context
+  const documentContext = getContext<DocumentContext>('document');
 
   // View state
   let views = $state<View[]>([]);
@@ -17,7 +20,36 @@
       views = state.views;
       activeViewId = state.activeViewId;
     });
-    return unsubscribe;
+
+    // Register as document observer
+    const unregisterObserver = documentContext.registerObserver({
+      onDocumentChanged: (document) => {
+        if (document) {
+          const cameraViews = document.sceneViewer.getCameraViews();
+
+          if (!cameraViews || cameraViews.length === 0) {
+            console.error('MainContent: No camera views available');
+            return;
+          }
+
+          const viewId = viewService.addView({
+            type: 'view3d',
+            title: '3D View',
+            closable: true,
+            data: {
+              scene: document.sceneViewer,
+              cameraViews: cameraViews
+            }
+          });
+          viewService.setActiveView(viewId);
+        }
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      unregisterObserver();
+    };
   });
 
   // Handle tab click
@@ -30,27 +62,6 @@
     event.stopPropagation();
     viewService.removeView(viewId);
   }
-
-  // Subscribe to document creation
-  onDocumentCreated((document: DocumentInterfaces) => {
-    console.log('MainContent: document created:', $inspect(document));
-
-    const cameraViews = document.sceneViewer.getCameraViews();
-    console.log('MainContent: cameraViews:', $inspect(cameraViews));
-
-    // Create a new 3D view for the document
-    const viewId = viewService.addView({
-      type: 'view3d',
-      title: '3D View',
-      closable: true,
-      data: {
-        scene: document.sceneViewer,
-        cameraViews: cameraViews
-      }
-    });
-    console.log('MainContent: created view with id:', viewId);
-    viewService.setActiveView(viewId);
-  });
 </script>
 
 <div class="main-content">

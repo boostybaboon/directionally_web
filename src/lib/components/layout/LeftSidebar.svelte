@@ -1,9 +1,14 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
   import DocumentPanel from '../panels/DocumentPanel.svelte';
   import CatalogPanel from '../panels/CatalogPanel.svelte';
   import SceneGraphPanel from '../panels/SceneGraphPanel.svelte';
-  import { createDocument } from '$lib/stores/DocumentStore.svelte';
-  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
+  import type { DocumentContext } from '$lib/types/document';
+  import { onMount } from 'svelte';
+
+  // Get document context
+  const documentContext = getContext<DocumentContext>('document');
+  const { openDocument, createDocument } = documentContext;
 
   // Simple enum-like type for tab IDs
   type TabId = 'document' | 'catalog' | 'sceneGraph';
@@ -14,26 +19,34 @@
     { id: 'catalog' as TabId, icon: '📚', title: 'Catalog' },
     { id: 'sceneGraph' as TabId, icon: '🌲', title: 'Scene Graph' }
   ];
-  
-  // Active tab state
-  let activeTab: TabId = 'document';
-  
-  // Simple function to switch tabs
-  function switchTab(tabId: TabId) {
-    console.log('Switching to tab:', tabId);
-    activeTab = tabId;
+
+  // Panel state
+  let activeTab = $state<TabId>('document');
+
+  // Handle tab click
+  function handleTabClick(tab: TabId) {
+    activeTab = tab;
   }
-  
-  // Handle document events from DocumentPanel
-  function handleDocumentCreated(document: DocumentInterfaces) {
-    console.log('LeftSidebar: handleDocumentCreated called with document:', document);
-    
-    // Use the store directly
-    createDocument(document);
-    
-    // Switch to scene graph view after creating document
-    switchTab('sceneGraph');
+
+  // Handle document creation
+  function handleDocumentCreated() {
+    createDocument();
+    activeTab = 'sceneGraph';
   }
+
+  onMount(() => {
+    const unregisterObserver = documentContext.registerObserver({
+      onDocumentChanged: (document) => {
+        if (document) {
+          activeTab = 'sceneGraph';
+        }
+      }
+    });
+
+    return () => {
+      unregisterObserver();
+    };
+  });
 </script>
 
 <div class="sidebar">
@@ -42,7 +55,7 @@
       <button 
         class="tab-button" 
         class:active={activeTab === tab.id}
-        onclick={() => switchTab(tab.id)} 
+        onclick={() => handleTabClick(tab.id)} 
         title={tab.title}
       >
         <span class="icon">{tab.icon}</span>
@@ -53,7 +66,10 @@
   <div class="tab-content">
     {#if activeTab === 'document'}
       <div class="panel-header">Document</div>
-      <DocumentPanel />
+      <DocumentPanel 
+        onCreateDocument={handleDocumentCreated}
+        onOpenDocument={openDocument}
+      />
     {:else if activeTab === 'catalog'}
       <div class="panel-header">Catalog</div>
       <CatalogPanel />
