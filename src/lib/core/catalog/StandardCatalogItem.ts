@@ -5,8 +5,8 @@ import { AddObject3D } from '../commands/AddObject3D';
 
 export interface CatalogItemMetadata {
     category: string;
-    icon: string;
     description: string;
+    icon?: string;
 }
 
 export abstract class StandardCatalogItem implements CatalogItem {
