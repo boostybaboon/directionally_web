@@ -1,15 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
   import type { DocumentContext } from '$lib/types/document';
-
-  // Document context type
-  type DocumentContext = {
-    currentDocument: DocumentInterfaces | null;
-    createDocument: () => void;
-    openDocument: () => void;
-    saveDocument: () => void;
-  };
 
   // Get document context
   const documentContext = getContext<DocumentContext>('document');

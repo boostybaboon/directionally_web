@@ -8,7 +8,7 @@
 
 
   // Get document context
-  const { currentDocument } = getContext<DocumentContext>('document');
+  const documentContext = getContext<DocumentContext>('document');
 
   // Get the standard catalog
   const catalogManager = CatalogManager.getInstance();
@@ -47,12 +47,11 @@
 
   // Handle item click
   function handleItemClick(item: CatalogItem) {
-    if (currentDocument) {
+    if (documentContext.currentDocument) {
       const command = item.createCommand();
-      currentDocument.commandExecutor.execute(command);
+      documentContext.currentDocument.commandExecutor.execute(command);
     } else {
       // No active document
-      alert('Please create a new document first');
     }
   }
 </script>

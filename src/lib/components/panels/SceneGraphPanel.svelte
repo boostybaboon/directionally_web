@@ -2,20 +2,12 @@
   import { getContext } from 'svelte';
   import TreeView from '$lib/components/common/TreeView.svelte';
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
-  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
   import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
+  import type { DocumentContext } from '$lib/types/document';
   import * as THREE from 'three';
   
-  // Document context type
-  type DocumentContext = {
-    currentDocument: DocumentInterfaces | null;
-    createDocument: () => void;
-    openDocument: () => void;
-    saveDocument: () => void;
-  };
-
   // Get document context
-  const { currentDocument } = getContext<DocumentContext>('document');
+  const documentContext = getContext<DocumentContext>('document');
   
   // Convert the scene hierarchy to a TreeNode structure
   function updateSceneGraph(sceneViewer: SceneViewer | null): TreeNode[] {
@@ -105,7 +97,7 @@
   }
 
   // Reactive scene graph updates
-  $: sceneGraph = updateSceneGraph(currentDocument?.sceneViewer ?? null);
+  $: sceneGraph = updateSceneGraph(documentContext.currentDocument?.sceneViewer ?? null);
 </script>
 
 <div class="scene-graph-panel">
