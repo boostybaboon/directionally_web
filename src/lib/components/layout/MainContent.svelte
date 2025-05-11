@@ -1,26 +1,46 @@
 <script lang="ts">
   import { onMount } from 'svelte';
   import { getContext } from 'svelte';
-  import { viewService } from '$lib/stores/ViewStore.svelte';
   import WelcomeView from '../views/WelcomeView.svelte';
   import View3D from '../views/View3D.svelte';
-  import type { View, ViewState } from '$lib/stores/ViewStore.svelte';
+  import type { View, ViewState } from '$lib/types/view';
   import type { DocumentContext } from '$lib/types/document';
 
   // Get document context
   const documentContext = getContext<DocumentContext>('document');
 
   // View state
-  let views = $state<View[]>([]);
-  let activeViewId = $state<string | null>(null);
+  let views = $state<View[]>([
+    {
+      id: 'welcome',
+      type: 'welcome',
+      title: 'Welcome',
+      closable: true
+    }
+  ]);
+  let activeViewId = $state<string | null>('welcome');
+
+  // View management functions
+  function addView(view: Omit<View, 'id'>) {
+    const id = `${view.type}-${Date.now()}`;
+    views = [...views, { ...view, id }];
+    activeViewId = id;
+    return id;
+  }
+
+  function removeView(id: string) {
+    views = views.filter(v => v.id !== id);
+    if (activeViewId === id) {
+      activeViewId = views.length > 0 ? views[0].id : null;
+    }
+  }
+
+  function setActiveView(id: string) {
+    activeViewId = id;
+  }
 
   // Initialize views
   onMount(() => {
-    const unsubscribe = viewService.subscribe((state: ViewState) => {
-      views = state.views;
-      activeViewId = state.activeViewId;
-    });
-
     // Register as document observer
     const unregisterObserver = documentContext.registerObserver({
       onDocumentChanged: (document) => {
@@ -32,7 +52,7 @@
             return;
           }
 
-          const viewId = viewService.addView({
+          const viewId = addView({
             type: 'view3d',
             title: '3D View',
             closable: true,
@@ -41,26 +61,25 @@
               cameraViews: cameraViews
             }
           });
-          viewService.setActiveView(viewId);
+          setActiveView(viewId);
         }
       }
     });
 
     return () => {
-      unsubscribe();
       unregisterObserver();
     };
   });
 
   // Handle tab click
   function handleTabClick(viewId: string) {
-    viewService.setActiveView(viewId);
+    setActiveView(viewId);
   }
 
   // Handle tab close
   function handleTabClose(viewId: string, event: MouseEvent) {
     event.stopPropagation();
-    viewService.removeView(viewId);
+    removeView(viewId);
   }
 </script>
 
