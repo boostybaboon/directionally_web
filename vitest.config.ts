@@ -13,7 +13,8 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '$lib': path.resolve('./src/lib')
+            '$lib': path.resolve('./src/lib'),
+            '$core': path.resolve('./src/core')
         }
     }
 }); 
