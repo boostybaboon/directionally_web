@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { StandardCatalogItem, type CatalogItemMetadata } from './StandardCatalogItem';
-import { CatalogItemType } from '../types/CatalogItemType';
+import { CatalogItemType } from '../../types/CatalogItemType';
 
 export class DirectionalLightItem extends StandardCatalogItem {
     constructor(id: string, metadata: CatalogItemMetadata, intensity: number = 1) {

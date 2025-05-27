@@ -1,60 +1,58 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { setContext } from 'svelte';
-  import LeftSidebar from './LeftSidebar.svelte';
+  import { getContext, setContext } from 'svelte';
   import MainContent from './MainContent.svelte';
+  import LeftSidebar from './LeftSidebar.svelte';
   import RightSidebar from './RightSidebar.svelte';
   import Toolbar from './Toolbar.svelte';
+  import { createDocumentManager } from '$core';
+  import type { DocumentInterfaces, DocumentContext, DocumentObserver } from '$core/interfaces/DocumentInterfaces';
   import { setupKeyboardShortcuts } from '$lib/ui/keyboard/KeyboardShortcuts';
-  import { DocumentManager } from '$lib/core/DocumentManager';
-  import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
-  import type { DocumentContext, DocumentObserver } from '$lib/types/document';
+
+  // Get document context
+  const documentContext = getContext<DocumentContext>('document');
+  const documentManager = createDocumentManager();
 
   // Document state
-  let currentDocument = $state<DocumentInterfaces | null>(null);
-  let observers: DocumentObserver[] = [];
-
-  // Update all observers with current document state
-  function updateObservers() {
-    observers.forEach((observer, index) => {
-      observer.onDocumentChanged(currentDocument);
-    });
-  }
+  let currentDocument: DocumentInterfaces | null = null;
+  const observers: DocumentObserver[] = [];
 
   // Document actions
   function createDocument() {
-    const documentManager = DocumentManager.getInstance();
     currentDocument = documentManager.createDefaultDocument();
     updateObservers();
   }
 
   function openDocument() {
-    // TODO: Implement file dialog and document opening
-    alert('Opening document... (Not implemented)');
+    // TODO: Implement document opening
+  }
+
+  function updateObservers() {
+    observers.forEach(observer => observer.onDocumentChanged(currentDocument));
   }
 
   function registerObserver(observer: DocumentObserver) {
-    observers = [...observers, observer];
-    // Immediately notify the new observer of current state
-    observer.onDocumentChanged(currentDocument);
-    // Return unregister function
+    observers.push(observer);
     return () => {
-      observers = observers.filter(o => o !== observer);
+      const index = observers.indexOf(observer);
+      if (index !== -1) {
+        observers.splice(index, 1);
+      }
     };
   }
 
   // Create document context object
-  const documentContext = {
+  const documentContextObject = {
     get currentDocument() { return currentDocument; },
     createDocument,
     openDocument,
     registerObserver
   };
 
-  setContext<DocumentContext>('document', documentContext);
+  setContext<DocumentContext>('document', documentContextObject);
 
   onMount(() => {
-    setupKeyboardShortcuts(documentContext);
+    setupKeyboardShortcuts(documentContextObject);
   });
 </script>
 

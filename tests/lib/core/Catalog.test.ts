@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
-import { Catalog } from '$lib/core/Catalog';
-import type { CatalogItem } from '$lib/core/interfaces/Catalog';
-import { AddObject3D } from '$lib/core/commands/AddObject3D';
-import { CatalogItemType } from '$lib/core/types/CatalogItemType';
+import { Catalog } from '$core/internal/Catalog';
+import type { CatalogItem } from '$core/interfaces/Catalog';
+import { AddObject3D } from '$core/internal/commands/AddObject3D';
+import { CatalogItemType } from '$core/types/CatalogItemType';
 
 // Mock CatalogItem for testing
 class MockCatalogItem implements CatalogItem {

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import type { Command } from '../Command';
-import type { SceneChanger } from '../interfaces/SceneChanger';
+import type { SceneChanger } from '../../interfaces/SceneChanger';
 
 export class AddObject3D implements Command {
     private object: THREE.Object3D;

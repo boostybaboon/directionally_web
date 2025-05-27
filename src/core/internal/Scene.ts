@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { CommandHistory } from './Command';
 import type { Command } from './Command';
-import type { CommandExecutor } from './interfaces/CommandExecutor';
-import type { SceneChanger } from './interfaces/SceneChanger';
-import type { SceneViewer } from './interfaces/SceneViewer';
-import type { CameraView } from './interfaces/CameraView';
-import { CameraType } from './types/CameraType';
+import type { CommandExecutor } from '../interfaces/CommandExecutor';
+import type { SceneChanger } from '../interfaces/SceneChanger';
+import type { SceneViewer } from '../interfaces/SceneViewer';
+import type { CameraView } from '../interfaces/CameraView';
+import { CameraType } from '../types/CameraType';
 import { SingleCameraView } from './views/SingleCameraView';
 
 export class Scene implements CommandExecutor, SceneChanger, SceneViewer {

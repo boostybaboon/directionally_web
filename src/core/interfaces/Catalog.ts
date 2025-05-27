@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import type { Command } from '../Command';
+import type { Command } from '../internal/Command';
+import { CatalogItemType } from '../types/CatalogItemType';
 
 export interface CatalogItem {
     id: string;
     name: string;
-    type: string;
+    type: CatalogItemType;
     metadata: Record<string, any>;
     createCommand(): Command;
     getPreview(): THREE.Object3D;
@@ -17,5 +18,5 @@ export interface Catalog {
     removeItem(id: string): void;
     getItem(id: string): CatalogItem | undefined;
     getAllItems(): CatalogItem[];
-    getItemsByType(type: string): readonly CatalogItem[];
+    getItemsByType(type: CatalogItemType): readonly CatalogItem[];
 } 

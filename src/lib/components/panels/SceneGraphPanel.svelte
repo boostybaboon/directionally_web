@@ -2,8 +2,8 @@
   import { getContext } from 'svelte';
   import TreeView from '$lib/components/common/TreeView.svelte';
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
-  import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
-  import type { DocumentContext } from '$lib/types/document';
+  import type { SceneViewer } from '$core/interfaces/SceneViewer';
+  import type { DocumentContext } from '$core/interfaces/DocumentInterfaces';
   import * as THREE from 'three';
   
   // Get document context

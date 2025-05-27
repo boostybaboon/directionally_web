@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import type { CatalogItem } from '../interfaces/Catalog';
-import { CatalogItemType } from '../types/CatalogItemType';
+import type { CatalogItem } from '../../interfaces/Catalog';
+import { CatalogItemType } from '../../types/CatalogItemType';
 import { AddObject3D } from '../commands/AddObject3D';
 
 export interface CatalogItemMetadata {

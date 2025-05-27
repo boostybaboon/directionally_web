@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
-import { AddObject3D } from '$lib/core/commands/AddObject3D';
-import { Scene } from '$lib/core/Scene';
+import { AddObject3D } from '$core/internal/commands/AddObject3D';
+import { Scene } from '$core/internal/Scene';
 
 describe('AddObject3D', () => {
     it('should add an object to the scene when executed', () => {

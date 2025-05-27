@@ -1,7 +1,7 @@
 import { Scene } from './Scene';
 import { AddDesignCamera } from './commands/AddDesignCamera';
 import * as THREE from 'three';
-import type { DocumentInterfaces } from './interfaces/DocumentInterfaces';
+import type { DocumentInterfaces } from '../interfaces/DocumentInterfaces';
 
 export class DocumentManager {
   private static instance: DocumentManager;

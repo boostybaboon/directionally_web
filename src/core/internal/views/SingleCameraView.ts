@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { CameraType } from '../types/CameraType';
-import type { CameraView } from '../interfaces/CameraView';
+import { CameraType } from '../../types/CameraType';
+import type { CameraView } from '../../interfaces/CameraView';
 
 export class SingleCameraView implements CameraView {
     private camera: THREE.PerspectiveCamera;

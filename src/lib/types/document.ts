@@ -1,4 +1,4 @@
-import type { DocumentInterfaces } from '$lib/core/interfaces/DocumentInterfaces';
+import type { DocumentInterfaces } from '$core/interfaces/DocumentInterfaces';
 
 export type DocumentObserver = {
   onDocumentChanged: (document: DocumentInterfaces | null) => void;

@@ -1,8 +1,8 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { CatalogManager } from '$lib/core/CatalogManager';
-  import type { CatalogItem } from '$lib/core/interfaces/Catalog';
-  import type { DocumentContext } from '$lib/types/document';
+  import { createCatalogManager } from '$core';
+  import type { CatalogItem } from '$core/interfaces/Catalog';
+  import type { DocumentContext } from '$core/interfaces/DocumentInterfaces';
 
   // Document context type
 
@@ -11,7 +11,7 @@
   const documentContext = getContext<DocumentContext>('document');
 
   // Get the standard catalog
-  const catalogManager = CatalogManager.getInstance();
+  const catalogManager = createCatalogManager();
   const catalog = catalogManager.getStandardCatalog();
 
   // Search state
@@ -95,19 +95,20 @@
         </div>
         {#if expandedCategories[category]}
           <div class="catalog-items">
-            {#each items as item}
+            {#each (items as CatalogItem[]) as item}
+              {@const typedItem = item as CatalogItem}
               <div 
                 class="catalog-item" 
                 role="button"
                 tabindex="0"
               >
                 <div class="item-content">
-                  <span class="item-name">{item.name}</span>
-                  <span class="item-description">{item.metadata.description}</span>
+                  <span class="item-name">{typedItem.name}</span>
+                  <span class="item-description">{typedItem.metadata.description}</span>
                 </div>
                 <button 
                   class="insert-button"
-                  onclick={(e) => handleInsertClick(e, item)}
+                  onclick={(e) => handleInsertClick(e, typedItem)}
                   title="Insert item"
                 >
                   +

@@ -1,5 +1,5 @@
-import type { Catalog as ICatalog, CatalogItem } from './interfaces/Catalog';
-import { CatalogItemType } from './types/CatalogItemType';
+import type { Catalog as ICatalog, CatalogItem } from '../interfaces/Catalog';
+import { CatalogItemType } from '../types/CatalogItemType';
 
 export class Catalog implements ICatalog {
     public readonly items: Map<string, CatalogItem> = new Map();

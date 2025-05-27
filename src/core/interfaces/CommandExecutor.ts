@@ -1,4 +1,4 @@
-import type { Command } from '../Command';
+import type { Command } from '../internal/Command';
  
 export interface CommandExecutor {
     execute(command: Command): void;

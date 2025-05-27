@@ -1,19 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
-import { StandardCatalogBuilder } from '$lib/core/catalog/StandardCatalogBuilder';
-import { Scene } from '$lib/core/Scene';
-import { CatalogItemType } from '$lib/core/types/CatalogItemType';
+import { StandardCatalogBuilder } from '$core/internal/catalog/StandardCatalogBuilder';
+import { Scene } from '$core/internal/Scene';
+import { CatalogItemType } from '$core/types/CatalogItemType';
+import type { CatalogItem } from '$core/interfaces/Catalog';
 
 describe('Catalog and Scene Integration', () => {
     it('should add a cube from catalog to scene', () => {
         // Arrange
-        const builder = new StandardCatalogBuilder();
-        const catalog = builder.build();
+        const catalog = StandardCatalogBuilder.build();
         const scene = new Scene();
 
         // Find the cube item in the catalog
         const cubeItem = catalog.getItemsByType(CatalogItemType.Mesh)
-            .find(item => item.name === 'Cube');
+            .find((item: CatalogItem) => item.name === 'Cube');
         expect(cubeItem).toBeDefined();
 
         // Act
@@ -34,13 +34,12 @@ describe('Catalog and Scene Integration', () => {
 
     it('should add and remove a directional light from catalog to scene', () => {
         // Arrange
-        const builder = new StandardCatalogBuilder();
-        const catalog = builder.build();
+        const catalog = StandardCatalogBuilder.build();
         const scene = new Scene();
 
         // Find the directional light item in the catalog
         const lightItem = catalog.getItemsByType(CatalogItemType.Light)
-            .find(item => item.name === 'Directional Light');
+            .find((item: CatalogItem) => item.name === 'Directional Light');
         expect(lightItem).toBeDefined();
 
         // Act - Add light
@@ -65,5 +64,21 @@ describe('Catalog and Scene Integration', () => {
             child => child instanceof THREE.DirectionalLight
         );
         expect(lightAfterUndo).toBeUndefined();
+    });
+
+    it('should create a catalog with standard items', () => {
+        const catalog = StandardCatalogBuilder.build();
+        
+        // Test mesh items
+        const cubeItem = catalog.getAllItems()
+            .find((item: CatalogItem) => item.name === 'Cube');
+        expect(cubeItem).toBeDefined();
+        expect(cubeItem?.type).toBe(CatalogItemType.Mesh);
+        
+        // Test light items
+        const directionalLight = catalog.getAllItems()
+            .find((item: CatalogItem) => item.name === 'Directional Light');
+        expect(directionalLight).toBeDefined();
+        expect(directionalLight?.type).toBe(CatalogItemType.Light);
     });
 }); 

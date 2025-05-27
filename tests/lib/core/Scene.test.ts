@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
-import { Scene } from '$lib/core/Scene';
-import { CameraType } from '$lib/core/types/CameraType';
+import { Scene } from '$core/internal/Scene';
+import { CameraType } from '$core/types/CameraType';
 
 describe('Scene with Camera Views', () => {
     it('should add design camera with associated CameraView', () => {

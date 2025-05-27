@@ -1,10 +1,15 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
+  import { getContext } from 'svelte';
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import type { SceneViewer } from '$lib/core/interfaces/SceneViewer';
-  import type { CameraView } from '$lib/core/interfaces/CameraView';
-  import { CameraType } from '$lib/core/types/CameraType';
+  import type { DocumentContext } from '$core/interfaces/DocumentInterfaces';
+  import type { SceneViewer } from '$core/interfaces/SceneViewer';
+  import type { CameraView } from '$core/interfaces/CameraView';
+  import { CameraType } from '$core/types/CameraType';
+  
+  // Get document context
+  const documentContext = getContext<DocumentContext>('document');
   
   // Props
   const { scene, cameraViews } = $props<{

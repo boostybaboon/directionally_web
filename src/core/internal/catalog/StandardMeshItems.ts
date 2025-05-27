@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { StandardCatalogItem, type CatalogItemMetadata } from './StandardCatalogItem';
-import { CatalogItemType } from '../types/CatalogItemType';
+import { CatalogItemType } from '../../types/CatalogItemType';
 
 export class CubeMeshItem extends StandardCatalogItem {
     constructor(id: string, size: number = 1, metadata: CatalogItemMetadata) {
