@@ -1,14 +1,19 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, onDestroy, onMount } from 'svelte';
   import TreeView from '$lib/components/common/TreeView.svelte';
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
   import type { SceneViewer } from '$core/interfaces/SceneViewer';
   import type { DocumentContext } from '$core/interfaces/DocumentInterfaces';
+  import type { DocumentInterfaces } from '$core/interfaces/DocumentInterfaces';
   import * as THREE from 'three';
   
   // Get document context
   const documentContext = getContext<DocumentContext>('document');
   
+  // Scene graph state
+  let sceneGraph: TreeNode[] = [];
+  let sceneUnsubscribe: (() => void) | null = null;
+
   // Convert the scene hierarchy to a TreeNode structure
   function updateSceneGraph(sceneViewer: SceneViewer | null): TreeNode[] {
     if (!sceneViewer) {
@@ -96,8 +101,44 @@
     }
   }
 
-  // Reactive scene graph updates
-  $: sceneGraph = updateSceneGraph(documentContext.currentDocument?.sceneViewer ?? null);
+  // Document observer
+  const documentObserver = {
+    onDocumentChanged(document: DocumentInterfaces | null) {
+      // Unsubscribe from previous scene if it exists
+      if (sceneUnsubscribe) {
+        sceneUnsubscribe();
+        sceneUnsubscribe = null;
+      }
+
+      // Update scene graph for new document
+      sceneGraph = updateSceneGraph(document?.sceneViewer ?? null);
+
+      // Subscribe to scene changes if we have a document
+      if (document?.sceneViewer) {
+        sceneUnsubscribe = document.sceneViewer.addSceneChangeObserver({
+          onSceneChanged: () => {
+            sceneGraph = updateSceneGraph(document.sceneViewer);
+          }
+        });
+      }
+    }
+  };
+
+  // Register observers on mount
+  onMount(() => {
+    const unsubscribeDocument = documentContext.registerObserver(documentObserver);
+    
+    // Initial population
+    sceneGraph = updateSceneGraph(documentContext.currentDocument?.sceneViewer ?? null);
+
+    // Cleanup on component destroy
+    return () => {
+      unsubscribeDocument();
+      if (sceneUnsubscribe) {
+        sceneUnsubscribe();
+      }
+    };
+  });
 </script>
 
 <div class="scene-graph-panel">

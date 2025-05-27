@@ -57,16 +57,28 @@
   </div>
   
   <div class="tab-content">
-    {#if activeTab === 'document'}
-      <div class="panel-header">Document</div>
-      <DocumentPanel />
-    {:else if activeTab === 'catalog'}
-      <div class="panel-header">Catalog</div>
-      <CatalogPanel />
-    {:else if activeTab === 'sceneGraph'}
-      <div class="panel-header">Scene Graph</div>
-      <SceneGraphPanel />
-    {/if}
+    <div class="panel-container">
+      <div class="panel" class:active={activeTab === 'document'}>
+        <div class="panel-header">Document</div>
+        <div class="panel-body">
+          <DocumentPanel />
+        </div>
+      </div>
+
+      <div class="panel" class:active={activeTab === 'catalog'}>
+        <div class="panel-header">Catalog</div>
+        <div class="panel-body">
+          <CatalogPanel />
+        </div>
+      </div>
+
+      <div class="panel" class:active={activeTab === 'sceneGraph'}>
+        <div class="panel-header">Scene Graph</div>
+        <div class="panel-body">
+          <SceneGraphPanel />
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -77,7 +89,7 @@
     background-color: #252526;
     color: #cccccc;
   }
-  
+
   .tab-buttons {
     display: flex;
     flex-direction: column;
@@ -85,7 +97,7 @@
     background-color: #333333;
     padding-top: 10px;
   }
-  
+
   .tab-button {
     display: flex;
     justify-content: center;
@@ -101,11 +113,15 @@
     position: relative;
     padding: 0;
   }
-  
+
+  .tab-button:hover {
+    color: #ffffff;
+  }
+
   .tab-button.active {
     color: #ffffff;
   }
-  
+
   .tab-button.active::before {
     content: "";
     position: absolute;
@@ -114,19 +130,41 @@
     width: 2px;
     background-color: #007acc;
   }
-  
+
   .tab-content {
     width: 250px;
-    overflow-y: auto;
-    display: flex;
+    overflow: hidden;
+  }
+
+  .panel-container {
+    height: 100%;
+    position: relative;
+  }
+
+  .panel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
     flex-direction: column;
   }
-  
+
+  .panel.active {
+    display: flex;
+  }
+
   .panel-header {
     font-size: 1rem;
     font-weight: bold;
     padding: 8px 16px;
     background-color: #2d2d2d;
     border-bottom: 1px solid #1e1e1e;
+  }
+
+  .panel-body {
+    flex: 1;
+    overflow-y: auto;
   }
 </style>
