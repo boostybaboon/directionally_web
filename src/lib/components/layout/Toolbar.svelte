@@ -1,9 +1,25 @@
 <script lang="ts">
-  import { getContext } from 'svelte';
+  import { getContext, onMount, onDestroy } from 'svelte';
   import type { DocumentContext } from '$lib/types/document';
+  import type { DocumentInterfaces } from '$core/interfaces/DocumentInterfaces';
 
   // Get document context
   const documentContext = getContext<DocumentContext>('document');
+  
+  // State to track if a document is active
+  let hasDocument = false;
+  
+  // Register an observer to update hasDocument when the document changes
+  const observer = {
+    onDocumentChanged(document: DocumentInterfaces | null) {
+      hasDocument = !!document;
+    }
+  };
+  const unsubscribe = documentContext.registerObserver(observer);
+  
+  onDestroy(() => {
+    unsubscribe();
+  });
   
   function handleUndo() {
     if (documentContext.currentDocument) {
@@ -19,8 +35,8 @@
 </script>
 
 <div class="toolbar">
-  <button onclick={handleUndo} title="Undo" disabled={!documentContext.currentDocument}>↩</button>
-  <button onclick={handleRedo} title="Redo" disabled={!documentContext.currentDocument}>↪</button>
+  <button onclick={handleUndo} title="Undo" disabled={!hasDocument}>↩</button>
+  <button onclick={handleRedo} title="Redo" disabled={!hasDocument}>↪</button>
 </div>
 
 <style>
