@@ -10,10 +10,7 @@ export * from './types/CatalogItemType';
 // Factory functions
 import { DocumentManager } from './internal/DocumentManager';
 import { CatalogManager } from './internal/CatalogManager';
-import { Scene } from './internal/Scene';
-import type { SceneViewer } from './interfaces/SceneViewer';
-import type { SceneChanger } from './interfaces/SceneChanger';
-import type { CommandExecutor } from './interfaces/CommandExecutor';
+
 
 // Document Management
 export function createDocumentManager(): DocumentManager {
@@ -24,8 +21,3 @@ export function createDocumentManager(): DocumentManager {
 export function createCatalogManager(): CatalogManager {
     return CatalogManager.getInstance();
 }
-
-// Scene Management
-export function createScene(): SceneViewer & SceneChanger & CommandExecutor {
-    return new Scene();
-} 
