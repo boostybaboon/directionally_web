@@ -4,7 +4,7 @@
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
   import type { SceneViewer } from '$core/interfaces/SceneViewer';
   import type { DocumentContext } from '$lib/types/DocumentContext';
-  import type { DocumentInterfaces } from '$core/interfaces/DocumentInterfaces';
+  import type { Production } from '$core/interfaces/Production';
   import * as THREE from 'three';
   
   // Get document context
@@ -103,7 +103,7 @@
 
   // Document observer
   const documentObserver = {
-    onDocumentChanged(document: DocumentInterfaces | null) {
+    onDocumentChanged(document: Production | null) {
       // Unsubscribe from previous scene if it exists
       if (sceneUnsubscribe) {
         sceneUnsubscribe();

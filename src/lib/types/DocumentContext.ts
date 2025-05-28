@@ -4,14 +4,14 @@
  */
 
 
-import type { DocumentInterfaces } from '$core/interfaces/DocumentInterfaces';
+import type { Production } from '$core/interfaces/Production';
 
 export type DocumentObserver = {
-  onDocumentChanged: (document: DocumentInterfaces | null) => void;
+  onDocumentChanged: (document: Production | null) => void;
 };
 
 export type DocumentContext = {
-  currentDocument: DocumentInterfaces | null;
+  currentDocument: Production | null;
   createDocument: () => void;
   openDocument: () => void;
   registerObserver: (observer: DocumentObserver) => () => void;

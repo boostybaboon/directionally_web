@@ -1,7 +1,7 @@
 import { Scene } from './Scene';
 import { AddDesignCamera } from './commands/AddDesignCamera';
 import * as THREE from 'three';
-import type { DocumentInterfaces } from '../interfaces/DocumentInterfaces';
+import type { Production } from '../interfaces/Production';
 
 export class DocumentManager {
   private static instance: DocumentManager;
@@ -15,7 +15,7 @@ export class DocumentManager {
     return DocumentManager.instance;
   }
   
-  public createDefaultDocument(): DocumentInterfaces {
+  public createDefaultDocument(): Production {
     const scene = new Scene();
     this.createDefaultCameraViews(scene);
     

@@ -6,7 +6,7 @@
   import RightSidebar from './RightSidebar.svelte';
   import Toolbar from './Toolbar.svelte';
   import { createDocumentManager } from '$core';
-  import type { DocumentInterfaces } from '$core/interfaces/DocumentInterfaces';
+  import type { Production } from '$core/interfaces/Production';
   import type { DocumentContext, DocumentObserver } from '$lib/types/DocumentContext'
   import { setupKeyboardShortcuts } from '$lib/ui/keyboard/KeyboardShortcuts';
 
@@ -14,7 +14,7 @@
   const documentManager = createDocumentManager();
 
   // Document state
-  let currentDocument: DocumentInterfaces | null = null;
+  let currentDocument: Production | null = null;
   const observers: DocumentObserver[] = [];
 
   // Document actions

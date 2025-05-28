@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext, onDestroy } from 'svelte';
   import type { DocumentContext } from '$lib/types/DocumentContext';
-  import type { DocumentInterfaces } from '$core/interfaces/DocumentInterfaces';
+  import type { Production } from '$core/interfaces/Production';
 
   // Get document context
   const documentContext = getContext<DocumentContext>('document');
@@ -11,7 +11,7 @@
   
   // Register an observer to update hasDocument when the document changes
   const observer = {
-    onDocumentChanged(document: DocumentInterfaces | null) {
+    onDocumentChanged(document: Production | null) {
       hasDocument = !!document;
     }
   };
