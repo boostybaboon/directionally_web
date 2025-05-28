@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { getContext, setContext } from 'svelte';
+  import { setContext } from 'svelte';
   import MainContent from './MainContent.svelte';
   import LeftSidebar from './LeftSidebar.svelte';
   import RightSidebar from './RightSidebar.svelte';
@@ -10,7 +10,6 @@
   import { setupKeyboardShortcuts } from '$lib/ui/keyboard/KeyboardShortcuts';
 
   // Get document context
-  const documentContext = getContext<DocumentContext>('document');
   const documentManager = createDocumentManager();
 
   // Document state
