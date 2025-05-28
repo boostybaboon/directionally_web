@@ -3,7 +3,7 @@
   import DocumentPanel from '../panels/DocumentPanel.svelte';
   import CatalogPanel from '../panels/CatalogPanel.svelte';
   import SceneGraphPanel from '../panels/SceneGraphPanel.svelte';
-  import type { DocumentContext } from '$lib/types/document';
+  import type { DocumentContext } from '$lib/types/DocumentContext';
   import { onMount } from 'svelte';
 
   // Get document context

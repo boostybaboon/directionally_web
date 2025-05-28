@@ -1,4 +1,4 @@
-import type { DocumentContext } from '$lib/types/document';
+import type { DocumentContext } from '$lib/types/DocumentContext';
 
 export function setupKeyboardShortcuts(documentContext: DocumentContext) {
   window.addEventListener('keydown', (e) => {

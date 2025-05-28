@@ -6,7 +6,8 @@
   import RightSidebar from './RightSidebar.svelte';
   import Toolbar from './Toolbar.svelte';
   import { createDocumentManager } from '$core';
-  import type { DocumentInterfaces, DocumentContext, DocumentObserver } from '$core/interfaces/DocumentInterfaces';
+  import type { DocumentInterfaces } from '$core/interfaces/DocumentInterfaces';
+  import type { DocumentContext, DocumentObserver } from '$lib/types/DocumentContext'
   import { setupKeyboardShortcuts } from '$lib/ui/keyboard/KeyboardShortcuts';
 
   // Get document context

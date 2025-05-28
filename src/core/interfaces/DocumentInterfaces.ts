@@ -7,14 +7,3 @@ export interface DocumentInterfaces {
   sceneChanger: SceneChanger;
   sceneViewer: SceneViewer;
 }
-
-export interface DocumentObserver {
-  onDocumentChanged: (document: DocumentInterfaces | null) => void;
-}
-
-export interface DocumentContext {
-  currentDocument: DocumentInterfaces | null;
-  createDocument: () => void;
-  openDocument: () => void;
-  registerObserver: (observer: DocumentObserver) => () => void;
-} 

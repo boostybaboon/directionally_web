@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext, onDestroy } from 'svelte';
-  import type { DocumentContext } from '$lib/types/document';
+  import type { DocumentContext } from '$lib/types/DocumentContext';
   import type { DocumentInterfaces } from '$core/interfaces/DocumentInterfaces';
 
   // Get document context

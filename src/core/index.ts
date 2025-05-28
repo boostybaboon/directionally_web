@@ -10,6 +10,6 @@ export function createDocumentManager(): DocumentManager {
 }
 
 // Catalog Management
-export function createCatalogManager(): CatalogManager {
+export function getCatalogManager(): CatalogManager {
     return CatalogManager.getInstance();
 }

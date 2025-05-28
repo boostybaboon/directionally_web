@@ -1,8 +1,8 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import { createCatalogManager } from '$core';
+  import { getCatalogManager } from '$core';
   import type { CatalogItem } from '$core/interfaces/Catalog';
-  import type { DocumentContext } from '$core/interfaces/DocumentInterfaces';
+  import type { DocumentContext } from '$lib/types/DocumentContext';
 
   // Document context type
 
@@ -11,7 +11,7 @@
   const documentContext = getContext<DocumentContext>('document');
 
   // Get the standard catalog
-  const catalogManager = createCatalogManager();
+  const catalogManager = getCatalogManager();
   const catalog = catalogManager.getStandardCatalog();
 
   // Search state

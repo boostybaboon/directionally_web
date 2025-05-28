@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import type { DocumentContext } from '$lib/types/document';
+  import type { DocumentContext } from '$lib/types/DocumentContext';
 
   // Get document context
   const documentContext = getContext<DocumentContext>('document');

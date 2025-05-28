@@ -3,7 +3,7 @@
   import { getContext } from 'svelte';
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import type { DocumentContext } from '$core/interfaces/DocumentInterfaces';
+  import type { DocumentContext } from '$lib/types/DocumentContext';
   import type { SceneViewer } from '$core/interfaces/SceneViewer';
   import type { CameraView } from '$core/interfaces/CameraView';
   import { CameraType } from '$core/types/CameraType';
