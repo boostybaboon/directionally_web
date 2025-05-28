@@ -96,8 +96,9 @@
     const { currentNode } = event.detail;
     if (currentNode && currentNode.data && currentNode.data.object) {
       const object = currentNode.data.object as THREE.Object3D;
-      // Here you could dispatch an event or call a service to show properties
-      // in the RightSidebar
+      if (productionContext.currentProduction) {
+        productionContext.currentProduction.sceneSelector.setSelectedObjects([object]);
+      }
     }
   }
 

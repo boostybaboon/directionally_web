@@ -4,12 +4,14 @@ import type { Command } from './Command';
 import type { CommandExecutor } from '../interfaces/CommandExecutor';
 import type { SceneChanger } from '../interfaces/SceneChanger';
 import type { SceneViewer } from '../interfaces/SceneViewer';
+import type { SceneSelector, SelectionListener } from '../interfaces/SceneSelector';
 import type { CameraView } from '../interfaces/CameraView';
 import type { SceneChangeObserver } from '../interfaces/SceneChangeObserver';
 import { CameraType } from '../types/CameraType';
 import { SingleCameraView } from './views/SingleCameraView';
 
-export class Scene implements CommandExecutor, SceneChanger, SceneViewer {
+//SceneSelector could be a separate object potentially, if that was an advantage
+export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneSelector {
     private threeScene: THREE.Scene;
     private commandHistory: CommandHistory;
     private designCameras: Map<string, THREE.PerspectiveCamera> = new Map();
@@ -17,6 +19,8 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer {
     private nextCameraId: number = 0;
     private cameraViews: CameraView[] = [];
     private sceneChangeObservers: SceneChangeObserver[] = [];
+    private selectedObjects: THREE.Object3D[] = [];
+    private selectionListeners: SelectionListener[] = [];
 
     constructor() {
         this.threeScene = new THREE.Scene();
@@ -125,5 +129,30 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer {
             );
             this.notifySceneChangeObservers();
         }
+    }
+
+    // SceneSelector implementation
+    public getSelectedObjects(): THREE.Object3D[] {
+        return [...this.selectedObjects];
+    }
+
+    public setSelectedObjects(objects: THREE.Object3D[]): void {
+        this.selectedObjects = [...objects];
+        this.notifySelectionListeners();
+    }
+
+    public addSelectionListener(listener: SelectionListener): () => void {
+        this.selectionListeners.push(listener);
+        return () => {
+            const index = this.selectionListeners.indexOf(listener);
+            if (index !== -1) {
+                this.selectionListeners.splice(index, 1);
+            }
+        };
+    }
+
+    private notifySelectionListeners(): void {
+        const selectedObjects = this.getSelectedObjects();
+        this.selectionListeners.forEach(listener => listener.onSelectionChanged(selectedObjects));
     }
 }

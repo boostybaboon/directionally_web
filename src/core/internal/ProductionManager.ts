@@ -22,7 +22,8 @@ export class ProductionManager {
     return {
       commandExecutor: scene,
       sceneChanger: scene,
-      sceneViewer: scene
+      sceneViewer: scene,
+      sceneSelector: scene
     };
   }
   

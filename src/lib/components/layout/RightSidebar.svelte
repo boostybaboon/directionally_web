@@ -1,4 +1,6 @@
 <script lang="ts">
+  import PropertiesPanel from '../panels/PropertiesPanel.svelte';
+  
   // Placeholder for properties panel
   let visible = true;
   
@@ -28,10 +30,7 @@
   {#if visible}
     <div class="sidebar-content">
       <div class="panel-header">Properties</div>
-      <div class="properties-placeholder">
-        <p>Properties Panel</p>
-        <p>Object properties will appear here</p>
-      </div>
+      <PropertiesPanel />
     </div>
   {/if}
 </div>
@@ -86,11 +85,5 @@
     padding: 8px 16px;
     background-color: #2d2d2d;
     border-bottom: 1px solid #1e1e1e;
-  }
-  
-  .properties-placeholder {
-    padding: 16px;
-    text-align: center;
-    color: #888888;
   }
 </style>
