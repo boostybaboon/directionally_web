@@ -3,19 +3,19 @@ import { AddDesignCamera } from './commands/AddDesignCamera';
 import * as THREE from 'three';
 import type { Production } from '../interfaces/Production';
 
-export class DocumentManager {
-  private static instance: DocumentManager;
+export class ProductionManager {
+  private static instance: ProductionManager;
   
   private constructor() {}
   
-  public static getInstance(): DocumentManager {
-    if (!DocumentManager.instance) {
-      DocumentManager.instance = new DocumentManager();
+  public static getInstance(): ProductionManager {
+    if (!ProductionManager.instance) {
+      ProductionManager.instance = new ProductionManager();
     }
-    return DocumentManager.instance;
+    return ProductionManager.instance;
   }
   
-  public createDefaultDocument(): Production {
+  public createProduction(): Production {
     const scene = new Scene();
     this.createDefaultCameraViews(scene);
     

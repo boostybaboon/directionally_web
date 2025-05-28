@@ -1,15 +1,15 @@
-
 // Factory functions
-import { DocumentManager } from './internal/DocumentManager';
-import { CatalogManager } from './internal/CatalogManager';
+import { ProductionManager } from './internal/ProductionManager';
+import type { CatalogManager } from './types/CatalogManager';
+import { CatalogManagerImpl } from './internal/CatalogManagerImpl';
 
 
 // Document Management
-export function createDocumentManager(): DocumentManager {
-    return DocumentManager.getInstance();
+export function getProductionManager(): ProductionManager {
+    return ProductionManager.getInstance();
 }
 
 // Catalog Management
 export function getCatalogManager(): CatalogManager {
-    return CatalogManager.getInstance();
+    return CatalogManagerImpl.getInstance();
 }

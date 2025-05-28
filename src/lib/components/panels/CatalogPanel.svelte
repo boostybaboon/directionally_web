@@ -4,9 +4,6 @@
   import type { CatalogItem } from '$core/interfaces/Catalog';
   import type { DocumentContext } from '$lib/types/DocumentContext';
 
-  // Document context type
-
-
   // Get document context
   const documentContext = getContext<DocumentContext>('document');
 

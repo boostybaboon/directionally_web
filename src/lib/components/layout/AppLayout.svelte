@@ -5,13 +5,13 @@
   import LeftSidebar from './LeftSidebar.svelte';
   import RightSidebar from './RightSidebar.svelte';
   import Toolbar from './Toolbar.svelte';
-  import { createDocumentManager } from '$core';
+  import { getProductionManager } from '$core';
   import type { Production } from '$core/interfaces/Production';
   import type { DocumentContext, DocumentObserver } from '$lib/types/DocumentContext'
   import { setupKeyboardShortcuts } from '$lib/ui/keyboard/KeyboardShortcuts';
 
   // Get document context
-  const documentManager = createDocumentManager();
+  const documentManager = getProductionManager();
 
   // Document state
   let currentDocument: Production | null = null;
@@ -19,7 +19,7 @@
 
   // Document actions
   function createDocument() {
-    currentDocument = documentManager.createDefaultDocument();
+    currentDocument = documentManager.createProduction();
     updateObservers();
   }
 
