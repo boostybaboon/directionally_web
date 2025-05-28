@@ -4,7 +4,7 @@ import type { CatalogManager } from './types/CatalogManager';
 import { CatalogManagerImpl } from './internal/CatalogManagerImpl';
 
 
-// Document Management
+// Production Management
 export function getProductionManager(): ProductionManager {
     return ProductionManager.getInstance();
 }

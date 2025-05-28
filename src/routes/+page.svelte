@@ -3,4 +3,4 @@
   import '$lib/styles/global.css'; // Import global CSS
 </script>
 
-<AppLayout on:documentCreated />
+<AppLayout />

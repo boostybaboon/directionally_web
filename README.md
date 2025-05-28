@@ -8,12 +8,12 @@ The application is structured around a core scene management system with a moder
 
 ### Core System (`src/lib/core/`)
 
-The core system handles the fundamental scene management and document operations:
+The core system handles the fundamental scene management and production operations:
 
-- **Document Management**
-  - `DocumentManager.ts`: Manages document lifecycle and state
-  - `DocumentInterfaces.ts`: Core interfaces for document operations
-  - Uses an observer pattern for document state changes
+- **Production Management**
+  - `ProductionManager.ts`: Manages production lifecycle and state
+  - `ProductionInterfaces.ts`: Core interfaces for production operations
+  - Uses an observer pattern for production state changes
 
 - **Scene System**
   - `Scene.ts`: Core scene management
@@ -37,7 +37,7 @@ The UI layer is built with Svelte 5 components and provides the user interface f
 - **Layout Components**
   - `AppLayout.svelte`: Main application layout
   - `MainContent.svelte`: Central content area with view management
-  - `LeftSidebar.svelte`: Navigation and document management
+  - `LeftSidebar.svelte`: Navigation and production management
   - `Toolbar.svelte`: Main action toolbar
 
 - **View System**
@@ -56,7 +56,7 @@ The UI layer is built with Svelte 5 components and provides the user interface f
 
 TypeScript interfaces and types used throughout the application:
 
-- `document.ts`: Document-related types
+- `production.ts`: Production-related types
 - `view.ts`: View management types
 - `catalog.ts`: Catalog item types
 
@@ -114,7 +114,7 @@ Supporting UI functionality:
 ```
 src/
 ├── lib/
-│   ├── core/           # Core scene and document management
+│   ├── core/           # Core scene and production management
 │   ├── components/     # Svelte components
 │   ├── types/          # TypeScript types and interfaces
 │   ├── ui/            # UI utilities and helpers
@@ -126,5 +126,5 @@ src/
 
 1. Follow the established architecture patterns
 2. Use TypeScript for all new code
-3. Write self-documenting code with clear interfaces
+3. Write self-productioning code with clear interfaces
 4. Keep components focused and maintainable

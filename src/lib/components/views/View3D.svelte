@@ -3,13 +3,10 @@
   import { getContext } from 'svelte';
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import type { DocumentContext } from '$lib/types/DocumentContext';
+  import type { ProductionContext } from '$lib/types/ProductionContext';
   import type { SceneViewer } from '$core/interfaces/SceneViewer';
   import type { CameraView } from '$core/interfaces/CameraView';
   import { CameraType } from '$core/types/CameraType';
-  
-  // Get document context
-  const documentContext = getContext<DocumentContext>('document');
   
   // Props
   const { scene, cameraViews } = $props<{

@@ -1,22 +1,22 @@
-import type { DocumentContext } from '$lib/types/DocumentContext';
+import type { ProductionContext } from '$lib/types/ProductionContext';
 
-export function setupKeyboardShortcuts(documentContext: DocumentContext) {
+export function setupKeyboardShortcuts(productionContext: ProductionContext) {
   window.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey) {  // metaKey for Mac
-      const { currentDocument } = documentContext;
-      if (!currentDocument) return;
+      const { currentProduction: currentProduction } = productionContext;
+      if (!currentProduction) return;
 
       const key = e.key.toLowerCase();
       if (key === 'z') {
         e.preventDefault();
         if (e.shiftKey) {
-          currentDocument.commandExecutor.redo();
+          currentProduction.commandExecutor.redo();
         } else {
-          currentDocument.commandExecutor.undo();
+          currentProduction.commandExecutor.undo();
         }
       } else if (key === 'y') {
         e.preventDefault();
-        currentDocument.commandExecutor.redo();
+        currentProduction.commandExecutor.redo();
       }
     }
   });

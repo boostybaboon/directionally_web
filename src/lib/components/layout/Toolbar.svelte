@@ -1,42 +1,42 @@
 <script lang="ts">
   import { getContext, onDestroy } from 'svelte';
-  import type { DocumentContext } from '$lib/types/DocumentContext';
+  import type { ProductionContext } from '$lib/types/ProductionContext';
   import type { Production } from '$core/interfaces/Production';
 
-  // Get document context
-  const documentContext = getContext<DocumentContext>('document');
+  // Get production context
+  const productionContext = getContext<ProductionContext>('production');
   
-  // State to track if a document is active
-  let hasDocument = false;
+  // State to track if a production is active
+  let hasProduction = false;
   
-  // Register an observer to update hasDocument when the document changes
+  // Register an observer to update hasProduction when the production changes
   const observer = {
-    onDocumentChanged(document: Production | null) {
-      hasDocument = !!document;
+    onProductionChanged(production: Production | null) {
+      hasProduction = !!production;
     }
   };
-  const unsubscribe = documentContext.registerObserver(observer);
+  const unsubscribe = productionContext.registerObserver(observer);
   
   onDestroy(() => {
     unsubscribe();
   });
   
   function handleUndo() {
-    if (documentContext.currentDocument) {
-      documentContext.currentDocument.commandExecutor.undo();
+    if (productionContext.currentProduction) {
+      productionContext.currentProduction.commandExecutor.undo();
     }
   }
   
   function handleRedo() {
-    if (documentContext.currentDocument) {
-      documentContext.currentDocument.commandExecutor.redo();
+    if (productionContext.currentProduction) {
+      productionContext.currentProduction.commandExecutor.redo();
     }
   }
 </script>
 
 <div class="toolbar">
-  <button onclick={handleUndo} title="Undo" disabled={!hasDocument}>↩</button>
-  <button onclick={handleRedo} title="Redo" disabled={!hasDocument}>↪</button>
+  <button onclick={handleUndo} title="Undo" disabled={!hasProduction}>↩</button>
+  <button onclick={handleRedo} title="Redo" disabled={!hasProduction}>↪</button>
 </div>
 
 <style>

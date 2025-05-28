@@ -1,32 +1,32 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import type { DocumentContext } from '$lib/types/DocumentContext';
+  import type { ProductionContext } from '$lib/types/ProductionContext';
 
-  // Get document context
-  const documentContext = getContext<DocumentContext>('document');
-  const { createDocument, openDocument } = documentContext;
+  // Get production context
+  const productionContext = getContext<ProductionContext>('production');
+  const { createProduction: createProduction, openProduction: openProduction } = productionContext;
 </script>
 
-<div class="document-panel">
+<div class="production-panel">
   <div class="action-section">
-    <h3>Document Actions</h3>
-    <button class="action-button" onclick={createDocument}>
-      <span class="icon">📝</span> Default Document
+    <h3>Production Actions</h3>
+    <button class="action-button" onclick={createProduction}>
+      <span class="icon">📝</span> Default Production
     </button>
     
-    <button class="action-button" onclick={openDocument}>
-      <span class="icon">📂</span> Open Document
+    <button class="action-button" onclick={openProduction}>
+      <span class="icon">📂</span> Open Production
     </button>
   </div>
   
-  <div class="recent-documents">
-    <h3>Recent Documents</h3>
-    <div class="empty-state">No recent documents</div>
+  <div class="recent-productions">
+    <h3>Recent Productions</h3>
+    <div class="empty-state">No recent productions</div>
   </div>
 </div>
 
 <style>
-  .document-panel {
+  .production-panel {
     padding: 16px;
   }
   
@@ -69,7 +69,7 @@
     font-size: 1rem;
   }
   
-  .recent-documents {
+  .recent-productions {
     color: #cccccc;
   }
   

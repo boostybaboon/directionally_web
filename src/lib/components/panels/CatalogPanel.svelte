@@ -2,10 +2,10 @@
   import { getContext } from 'svelte';
   import { getCatalogManager } from '$core';
   import type { CatalogItem } from '$core/interfaces/Catalog';
-  import type { DocumentContext } from '$lib/types/DocumentContext';
+  import type { ProductionContext } from '$lib/types/ProductionContext';
 
-  // Get document context
-  const documentContext = getContext<DocumentContext>('document');
+  // Get production context
+  const productionContext = getContext<ProductionContext>('production');
 
   // Get the standard catalog
   const catalogManager = getCatalogManager();
@@ -53,11 +53,11 @@
 
   // Handle item click
   function handleItemClick(item: CatalogItem) {
-    if (documentContext.currentDocument) {
+    if (productionContext.currentProduction) {
       const command = item.createCommand();
-      documentContext.currentDocument.commandExecutor.execute(command);
+      productionContext.currentProduction.commandExecutor.execute(command);
     } else {
-      // No active document
+      // No active production
     }
   }
 

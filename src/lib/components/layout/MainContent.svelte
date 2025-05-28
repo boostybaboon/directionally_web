@@ -4,10 +4,10 @@
   import WelcomeView from '../views/WelcomeView.svelte';
   import View3D from '../views/View3D.svelte';
   import type { View } from '$lib/types/View';
-  import type { DocumentContext } from '$lib/types/DocumentContext';
+  import type { ProductionContext } from '$lib/types/ProductionContext';
 
-  // Get document context
-  const documentContext = getContext<DocumentContext>('document');
+  // Get production context
+  const productionContext = getContext<ProductionContext>('production');
 
   // View state
   let views = $state<View[]>([
@@ -41,11 +41,11 @@
 
   // Initialize views
   onMount(() => {
-    // Register as document observer
-    const unregisterObserver = documentContext.registerObserver({
-      onDocumentChanged: (document) => {
-        if (document) {
-          const cameraViews = document.sceneViewer.getCameraViews();
+    // Register as production observer
+    const unregisterObserver = productionContext.registerObserver({
+      onProductionChanged: (production) => {
+        if (production) {
+          const cameraViews = production.sceneViewer.getCameraViews();
 
           if (!cameraViews || cameraViews.length === 0) {
             console.error('MainContent: No camera views available');
@@ -57,7 +57,7 @@
             title: '3D View',
             closable: true,
             data: {
-              scene: document.sceneViewer,
+              scene: production.sceneViewer,
               cameraViews: cameraViews
             }
           });

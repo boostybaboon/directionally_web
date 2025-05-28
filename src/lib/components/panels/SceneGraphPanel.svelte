@@ -3,12 +3,12 @@
   import TreeView from '$lib/components/common/TreeView.svelte';
   import type { TreeNode } from '$lib/components/common/TreeView.svelte';
   import type { SceneViewer } from '$core/interfaces/SceneViewer';
-  import type { DocumentContext } from '$lib/types/DocumentContext';
+  import type { ProductionContext } from '$lib/types/ProductionContext';
   import type { Production } from '$core/interfaces/Production';
   import * as THREE from 'three';
   
-  // Get document context
-  const documentContext = getContext<DocumentContext>('document');
+  // Get produciton context
+  const productionContext = getContext<ProductionContext>('production');
   
   // Scene graph state
   let sceneGraph: TreeNode[] = [];
@@ -101,23 +101,23 @@
     }
   }
 
-  // Document observer
-  const documentObserver = {
-    onDocumentChanged(document: Production | null) {
+  // Production observer
+  const productionObserver = {
+    onProductionChanged(production: Production | null) {
       // Unsubscribe from previous scene if it exists
       if (sceneUnsubscribe) {
         sceneUnsubscribe();
         sceneUnsubscribe = null;
       }
 
-      // Update scene graph for new document
-      sceneGraph = updateSceneGraph(document?.sceneViewer ?? null);
+      // Update scene graph for new production
+      sceneGraph = updateSceneGraph(production?.sceneViewer ?? null);
 
-      // Subscribe to scene changes if we have a document
-      if (document?.sceneViewer) {
-        sceneUnsubscribe = document.sceneViewer.addSceneChangeObserver({
+      // Subscribe to scene changes if we have a production
+      if (production?.sceneViewer) {
+        sceneUnsubscribe = production.sceneViewer.addSceneChangeObserver({
           onSceneChanged: () => {
-            sceneGraph = updateSceneGraph(document.sceneViewer);
+            sceneGraph = updateSceneGraph(production.sceneViewer);
           }
         });
       }
@@ -126,14 +126,14 @@
 
   // Register observers on mount
   onMount(() => {
-    const unsubscribeDocument = documentContext.registerObserver(documentObserver);
+    const unsubscribeProduction = productionContext.registerObserver(productionObserver);
     
     // Initial population
-    sceneGraph = updateSceneGraph(documentContext.currentDocument?.sceneViewer ?? null);
+    sceneGraph = updateSceneGraph(productionContext.currentProduction?.sceneViewer ?? null);
 
     // Cleanup on component destroy
     return () => {
-      unsubscribeDocument();
+      unsubscribeProduction();
       if (sceneUnsubscribe) {
         sceneUnsubscribe();
       }
@@ -161,7 +161,7 @@
   
   <div class="tree-container">
     {#if sceneGraph.length === 0}
-      <div class="empty-state">No scene available. Create a new document first.</div>
+      <div class="empty-state">No scene available. Create a new production first.</div>
     {:else}
       <TreeView 
         nodes={sceneGraph} 

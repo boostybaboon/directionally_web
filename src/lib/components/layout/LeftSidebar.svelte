@@ -1,26 +1,26 @@
 <script lang="ts">
   import { getContext } from 'svelte';
-  import DocumentPanel from '../panels/DocumentPanel.svelte';
+  import ProductionPanel from '../panels/ProductionPanel.svelte';
   import CatalogPanel from '../panels/CatalogPanel.svelte';
   import SceneGraphPanel from '../panels/SceneGraphPanel.svelte';
-  import type { DocumentContext } from '$lib/types/DocumentContext';
+  import type { ProductionContext } from '$lib/types/ProductionContext';
   import { onMount } from 'svelte';
 
-  // Get document context
-  const documentContext = getContext<DocumentContext>('document');
+  // Get production context
+  const productionContext = getContext<ProductionContext>('production');
 
   // Simple enum-like type for tab IDs
-  type TabId = 'document' | 'catalog' | 'sceneGraph';
+  type TabId = 'production' | 'catalog' | 'sceneGraph';
   
   // Tab definitions
   const tabs = [
-    { id: 'document' as TabId, icon: '📄', title: 'Document' },
+    { id: 'production' as TabId, icon: '📄', title: 'Production' },
     { id: 'catalog' as TabId, icon: '📚', title: 'Catalog' },
     { id: 'sceneGraph' as TabId, icon: '🌲', title: 'Scene Graph' }
   ];
 
   // Panel state
-  let activeTab = $state<TabId>('document');
+  let activeTab = $state<TabId>('production');
 
   // Handle tab click
   function handleTabClick(tab: TabId) {
@@ -28,9 +28,9 @@
   }
 
   onMount(() => {
-    const unregisterObserver = documentContext.registerObserver({
-      onDocumentChanged: (document) => {
-        if (document) {
+    const unregisterObserver = productionContext.registerObserver({
+      onProductionChanged: (production) => {
+        if (production) {
           activeTab = 'sceneGraph';
         }
       }
@@ -58,10 +58,10 @@
   
   <div class="tab-content">
     <div class="panel-container">
-      <div class="panel" class:active={activeTab === 'document'}>
-        <div class="panel-header">Document</div>
+      <div class="panel" class:active={activeTab === 'production'}>
+        <div class="panel-header">Production</div>
         <div class="panel-body">
-          <DocumentPanel />
+          <ProductionPanel />
         </div>
       </div>
 

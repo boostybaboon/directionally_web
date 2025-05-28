@@ -7,31 +7,31 @@
   import Toolbar from './Toolbar.svelte';
   import { getProductionManager } from '$core';
   import type { Production } from '$core/interfaces/Production';
-  import type { DocumentContext, DocumentObserver } from '$lib/types/DocumentContext'
+  import type { ProductionContext, ProductionObserver } from '$lib/types/ProductionContext'
   import { setupKeyboardShortcuts } from '$lib/ui/keyboard/KeyboardShortcuts';
 
-  // Get document context
-  const documentManager = getProductionManager();
+  // Get production context
+  const productionManager = getProductionManager();
 
-  // Document state
-  let currentDocument: Production | null = null;
-  const observers: DocumentObserver[] = [];
+  // Production state
+  let currentProduction: Production | null = null;
+  const observers: ProductionObserver[] = [];
 
-  // Document actions
-  function createDocument() {
-    currentDocument = documentManager.createProduction();
+  // Production actions
+  function createProduction() {
+    currentProduction = productionManager.createProduction();
     updateObservers();
   }
 
-  function openDocument() {
-    // TODO: Implement document opening
+  function openProduction() {
+    // TODO: Implement production deserialisation
   }
 
   function updateObservers() {
-    observers.forEach(observer => observer.onDocumentChanged(currentDocument));
+    observers.forEach(observer => observer.onProductionChanged(currentProduction));
   }
 
-  function registerObserver(observer: DocumentObserver) {
+  function registerObserver(observer: ProductionObserver) {
     observers.push(observer);
     return () => {
       const index = observers.indexOf(observer);
@@ -41,18 +41,18 @@
     };
   }
 
-  // Create document context object
-  const documentContextObject = {
-    get currentDocument() { return currentDocument; },
-    createDocument,
-    openDocument,
+  // Create production context object
+  const productionContextObject = {
+    get currentProduction() { return currentProduction; },
+    createProduction,
+    openProduction,
     registerObserver
   };
 
-  setContext<DocumentContext>('document', documentContextObject);
+  setContext<ProductionContext>('production', productionContextObject);
 
   onMount(() => {
-    setupKeyboardShortcuts(documentContextObject);
+    setupKeyboardShortcuts(productionContextObject);
   });
 </script>
 
