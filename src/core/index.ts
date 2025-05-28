@@ -1,11 +1,3 @@
-// Core public API
-export * from './interfaces/Catalog';
-export * from './interfaces/DocumentInterfaces';
-export * from './interfaces/CommandExecutor';
-export * from './interfaces/SceneChanger';
-export * from './interfaces/SceneViewer';
-export * from './types/CameraType';
-export * from './types/CatalogItemType';
 
 // Factory functions
 import { DocumentManager } from './internal/DocumentManager';
