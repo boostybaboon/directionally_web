@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { PropertyProvider, CameraProperties } from '../../interfaces/PropertyProvider';
 
-export class CameraPropertyProvider implements PropertyProvider {
+export class CameraPropertyProvider implements PropertyProvider<CameraProperties> {
   constructor(private camera: THREE.PerspectiveCamera) {}
 
   getProperties(): CameraProperties {
@@ -16,8 +16,6 @@ export class CameraPropertyProvider implements PropertyProvider {
   }
 
   applyProperties(props: CameraProperties): void {
-    if (!this.isCameraProperties(props)) return;
-
     this.camera.position.copy(props.position);
     this.camera.rotation.copy(props.rotation);
     this.camera.scale.copy(props.scale);
@@ -25,9 +23,5 @@ export class CameraPropertyProvider implements PropertyProvider {
     this.camera.near = props.near;
     this.camera.far = props.far;
     this.camera.updateProjectionMatrix();
-  }
-
-  private isCameraProperties(props: any): props is CameraProperties {
-    return 'fov' in props && 'near' in props && 'far' in props;
   }
 } 

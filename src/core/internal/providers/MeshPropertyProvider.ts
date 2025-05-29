@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { PropertyProvider, MeshProperties } from '../../interfaces/PropertyProvider';
 
-export class MeshPropertyProvider implements PropertyProvider {
+export class MeshPropertyProvider implements PropertyProvider<MeshProperties> {
   constructor(private mesh: THREE.Mesh) {}
 
   getProperties(): MeshProperties {
@@ -19,8 +19,6 @@ export class MeshPropertyProvider implements PropertyProvider {
   }
 
   applyProperties(props: MeshProperties): void {
-    if (!this.isMeshProperties(props)) return;
-
     this.mesh.position.copy(props.position);
     this.mesh.rotation.copy(props.rotation);
     this.mesh.scale.copy(props.scale);
@@ -29,9 +27,5 @@ export class MeshPropertyProvider implements PropertyProvider {
     material.color.copy(props.material.color);
     material.opacity = props.material.opacity;
     material.transparent = props.material.transparent;
-  }
-
-  private isMeshProperties(props: any): props is MeshProperties {
-    return 'material' in props;
   }
 } 

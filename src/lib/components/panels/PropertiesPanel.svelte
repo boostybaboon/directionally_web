@@ -4,7 +4,10 @@
   import type { SelectionListener, SelectedObject } from '$core/interfaces/SceneSelector';
   import type { ProductionContext } from '$lib/types/ProductionContext';
   import type { Production } from '$core/interfaces/Production';
-  import type { ObjectProperties } from '$core/interfaces/PropertyProvider';
+  import type { ObjectProperties, MeshProperties, LightProperties, CameraProperties } from '$core/interfaces/PropertyProvider';
+  import { MeshPropertyProvider } from '$core/internal/providers/MeshPropertyProvider';
+  import { LightPropertyProvider } from '$core/internal/providers/LightPropertyProvider';
+  import { CameraPropertyProvider } from '$core/internal/providers/CameraPropertyProvider';
   import * as THREE from 'three';
 
   // Get production context
@@ -135,7 +138,7 @@
     <div class="empty-state">No object selected</div>
   {:else if selectedObjects.length === 1 && editingProperties}
     {@const selected = selectedObjects[0]}
-    {@const props = editingProperties as ObjectProperties}
+    {@const props = editingProperties}
     
     <div class="property-group">
       <h3>Transform</h3>
@@ -237,7 +240,8 @@
       </div>
     </div>
 
-    {#if 'material' in props}
+    {#if selected.propertyProvider instanceof MeshPropertyProvider}
+      {@const meshProps = props as MeshProperties}
       <div class="property-group">
         <h3>Material</h3>
         <div class="property">
@@ -245,8 +249,8 @@
           <input 
             id="color" 
             type="color" 
-            value={formatColor(props.material.color)}
-            on:change={(e) => handleColorChange(props.material.color, e.currentTarget.value)}
+            value={formatColor(meshProps.material.color)}
+            on:change={(e) => handleColorChange(meshProps.material.color, e.currentTarget.value)}
           />
         </div>
         <div class="property">
@@ -257,14 +261,15 @@
             min="0" 
             max="1" 
             step="0.1" 
-            value={props.material.opacity}
-            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => props.material.opacity = v)}
+            value={meshProps.material.opacity}
+            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => meshProps.material.opacity = v)}
           />
         </div>
       </div>
     {/if}
 
-    {#if 'intensity' in props}
+    {#if selected.propertyProvider instanceof LightPropertyProvider}
+      {@const lightProps = props as LightProperties}
       <div class="property-group">
         <h3>Light</h3>
         <div class="property">
@@ -272,8 +277,8 @@
           <input 
             id="light-color" 
             type="color" 
-            value={formatColor(props.color)}
-            on:change={(e) => handleColorChange(props.color, e.currentTarget.value)}
+            value={formatColor(lightProps.color)}
+            on:change={(e) => handleColorChange(lightProps.color, e.currentTarget.value)}
           />
         </div>
         <div class="property">
@@ -283,14 +288,15 @@
             type="number" 
             min="0" 
             step="0.1" 
-            value={props.intensity}
-            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => props.intensity = v)}
+            value={lightProps.intensity}
+            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => lightProps.intensity = v)}
           />
         </div>
       </div>
     {/if}
 
-    {#if 'fov' in props}
+    {#if selected.propertyProvider instanceof CameraPropertyProvider}
+      {@const cameraProps = props as CameraProperties}
       <div class="property-group">
         <h3>Camera</h3>
         <div class="property">
@@ -300,8 +306,8 @@
             type="number" 
             min="1" 
             max="180" 
-            value={props.fov}
-            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => props.fov = v)}
+            value={cameraProps.fov}
+            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => cameraProps.fov = v)}
           />
         </div>
         <div class="property">
@@ -311,8 +317,8 @@
             type="number" 
             min="0.1" 
             step="0.1" 
-            value={props.near}
-            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => props.near = v)}
+            value={cameraProps.near}
+            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => cameraProps.near = v)}
           />
         </div>
         <div class="property">
@@ -322,8 +328,8 @@
             type="number" 
             min="1" 
             step="1" 
-            value={props.far}
-            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => props.far = v)}
+            value={cameraProps.far}
+            on:change={(e) => handleNumberChange(e.currentTarget.value, (v) => cameraProps.far = v)}
           />
         </div>
       </div>

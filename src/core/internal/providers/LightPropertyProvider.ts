@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import type { PropertyProvider, LightProperties } from '../../interfaces/PropertyProvider';
 
-export class LightPropertyProvider implements PropertyProvider {
+export class LightPropertyProvider implements PropertyProvider<LightProperties> {
   constructor(private light: THREE.Light) {}
 
   getProperties(): LightProperties {
@@ -15,16 +15,10 @@ export class LightPropertyProvider implements PropertyProvider {
   }
 
   applyProperties(props: LightProperties): void {
-    if (!this.isLightProperties(props)) return;
-
     this.light.position.copy(props.position);
     this.light.rotation.copy(props.rotation);
     this.light.scale.copy(props.scale);
     this.light.color.copy(props.color);
     this.light.intensity = props.intensity;
-  }
-
-  private isLightProperties(props: any): props is LightProperties {
-    return 'color' in props && 'intensity' in props;
   }
 } 

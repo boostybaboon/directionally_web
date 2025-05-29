@@ -25,9 +25,9 @@ export interface CameraProperties extends TransformProperties {
   far: number;
 }
 
-export type ObjectProperties = TransformProperties | MeshProperties | LightProperties | CameraProperties;
+export type ObjectProperties = MeshProperties | LightProperties | CameraProperties;
 
-export interface PropertyProvider {
-  getProperties(): ObjectProperties;
-  applyProperties(properties: ObjectProperties): void;
+export interface PropertyProvider<T extends ObjectProperties = ObjectProperties> {
+  getProperties(): T;
+  applyProperties(properties: T): void;
 } 
