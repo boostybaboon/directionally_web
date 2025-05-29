@@ -1,31 +1,36 @@
 import * as THREE from 'three';
 
-export interface TransformProperties {
+export interface ObjectProperties {
+  type: 'transform' | 'mesh' | 'light' | 'camera';
+}
+
+export interface TransformBase {
   position: THREE.Vector3;
   rotation: THREE.Euler;
   scale: THREE.Vector3;
 }
 
-export interface MeshProperties extends TransformProperties {
-  material: {
-    color: THREE.Color;
-    opacity: number;
-    transparent: boolean;
-  };
+export interface TransformProperties extends ObjectProperties, TransformBase {
+  type: 'transform';
 }
 
-export interface LightProperties extends TransformProperties {
+export interface MeshProperties extends ObjectProperties, TransformBase {
+  type: 'mesh';
+  material: THREE.MeshBasicMaterial;
+}
+
+export interface LightProperties extends ObjectProperties, TransformBase {
+  type: 'light';
   color: THREE.Color;
   intensity: number;
 }
 
-export interface CameraProperties extends TransformProperties {
+export interface CameraProperties extends ObjectProperties, TransformBase {
+  type: 'camera';
   fov: number;
   near: number;
   far: number;
 }
-
-export type ObjectProperties = MeshProperties | LightProperties | CameraProperties;
 
 export interface PropertyProvider<T extends ObjectProperties = ObjectProperties> {
   getProperties(): T;

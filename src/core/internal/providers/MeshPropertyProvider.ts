@@ -7,14 +7,11 @@ export class MeshPropertyProvider implements PropertyProvider<MeshProperties> {
   getProperties(): MeshProperties {
     const material = this.mesh.material as THREE.MeshBasicMaterial;
     return {
+      type: 'mesh',
       position: this.mesh.position.clone(),
       rotation: this.mesh.rotation.clone(),
       scale: this.mesh.scale.clone(),
-      material: {
-        color: material.color.clone(),
-        opacity: material.opacity,
-        transparent: material.transparent
-      }
+      material: material.clone()
     };
   }
 

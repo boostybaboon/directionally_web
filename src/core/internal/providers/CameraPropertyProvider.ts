@@ -6,6 +6,7 @@ export class CameraPropertyProvider implements PropertyProvider<CameraProperties
 
   getProperties(): CameraProperties {
     return {
+      type: 'camera',
       position: this.camera.position.clone(),
       rotation: this.camera.rotation.clone(),
       scale: this.camera.scale.clone(),

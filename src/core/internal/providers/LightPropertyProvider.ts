@@ -6,6 +6,7 @@ export class LightPropertyProvider implements PropertyProvider<LightProperties> 
 
   getProperties(): LightProperties {
     return {
+      type: 'light',
       position: this.light.position.clone(),
       rotation: this.light.rotation.clone(),
       scale: this.light.scale.clone(),

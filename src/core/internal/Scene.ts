@@ -146,10 +146,11 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneS
         }
         // Return default transform properties if no provider exists
         return {
+            type: 'transform',
             position: object.position.clone(),
             rotation: object.rotation.clone(),
             scale: object.scale.clone()
-        };
+        } as import('../interfaces/PropertyProvider').TransformProperties;
     }
 
     // SceneSelector implementation
