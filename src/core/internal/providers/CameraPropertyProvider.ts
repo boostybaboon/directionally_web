@@ -1,28 +1,45 @@
 import * as THREE from 'three';
 import type { PropertyProvider, CameraProperties } from '../../interfaces/PropertyProvider';
+import { BasePropertyProvider } from './BasePropertyProvider';
 
-export class CameraPropertyProvider implements PropertyProvider<CameraProperties> {
-  constructor(private camera: THREE.PerspectiveCamera) {}
+export class CameraPropertyProvider extends BasePropertyProvider<CameraProperties> implements PropertyProvider<CameraProperties> {
+  protected readonly type = 'camera' as const;
+  protected readonly object: THREE.PerspectiveCamera;
+
+  constructor(camera: THREE.PerspectiveCamera) {
+    super();
+    this.object = camera;
+  }
 
   getProperties(): CameraProperties {
-    return {
+    return this.cloneProperties({
       type: 'camera',
-      position: this.camera.position.clone(),
-      rotation: this.camera.rotation.clone(),
-      scale: this.camera.scale.clone(),
-      fov: this.camera.fov,
-      near: this.camera.near,
-      far: this.camera.far
+      position: this.object.position,
+      rotation: this.object.rotation,
+      scale: this.object.scale,
+      fov: this.object.fov,
+      near: this.object.near,
+      far: this.object.far
+    });
+  }
+
+  cloneProperties(props: CameraProperties): CameraProperties {
+    return {
+      ...this.cloneTransformBase(props),
+      type: this.type,
+      fov: props.fov,
+      near: props.near,
+      far: props.far
     };
   }
 
   applyProperties(props: CameraProperties): void {
-    this.camera.position.copy(props.position);
-    this.camera.rotation.copy(props.rotation);
-    this.camera.scale.copy(props.scale);
-    this.camera.fov = props.fov;
-    this.camera.near = props.near;
-    this.camera.far = props.far;
-    this.camera.updateProjectionMatrix();
+    this.object.position.copy(props.position);
+    this.object.rotation.copy(props.rotation);
+    this.object.scale.copy(props.scale);
+    this.object.fov = props.fov;
+    this.object.near = props.near;
+    this.object.far = props.far;
+    this.object.updateProjectionMatrix();
   }
 } 

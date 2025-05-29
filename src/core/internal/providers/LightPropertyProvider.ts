@@ -1,25 +1,41 @@
 import * as THREE from 'three';
 import type { PropertyProvider, LightProperties } from '../../interfaces/PropertyProvider';
+import { BasePropertyProvider } from './BasePropertyProvider';
 
-export class LightPropertyProvider implements PropertyProvider<LightProperties> {
-  constructor(private light: THREE.Light) {}
+export class LightPropertyProvider extends BasePropertyProvider<LightProperties> implements PropertyProvider<LightProperties> {
+  protected readonly type = 'light' as const;
+  protected readonly object: THREE.Light;
+
+  constructor(light: THREE.Light) {
+    super();
+    this.object = light;
+  }
 
   getProperties(): LightProperties {
-    return {
+    return this.cloneProperties({
       type: 'light',
-      position: this.light.position.clone(),
-      rotation: this.light.rotation.clone(),
-      scale: this.light.scale.clone(),
-      color: this.light.color.clone(),
-      intensity: this.light.intensity
+      position: this.object.position,
+      rotation: this.object.rotation,
+      scale: this.object.scale,
+      color: this.object.color,
+      intensity: this.object.intensity
+    });
+  }
+
+  cloneProperties(props: LightProperties): LightProperties {
+    return {
+      ...this.cloneTransformBase(props),
+      type: this.type,
+      color: props.color.clone(),
+      intensity: props.intensity
     };
   }
 
   applyProperties(props: LightProperties): void {
-    this.light.position.copy(props.position);
-    this.light.rotation.copy(props.rotation);
-    this.light.scale.copy(props.scale);
-    this.light.color.copy(props.color);
-    this.light.intensity = props.intensity;
+    this.object.position.copy(props.position);
+    this.object.rotation.copy(props.rotation);
+    this.object.scale.copy(props.scale);
+    this.object.color.copy(props.color);
+    this.object.intensity = props.intensity;
   }
 } 

@@ -35,4 +35,5 @@ export interface CameraProperties extends ObjectProperties, TransformBase {
 export interface PropertyProvider<T extends ObjectProperties = ObjectProperties> {
   getProperties(): T;
   applyProperties(properties: T): void;
+  cloneProperties(properties: T): T;
 } 

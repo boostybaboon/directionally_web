@@ -1,35 +1,52 @@
 import * as THREE from 'three';
 import type { PropertyProvider, MeshProperties } from '../../interfaces/PropertyProvider';
+import { BasePropertyProvider } from './BasePropertyProvider';
 
-export class MeshPropertyProvider implements PropertyProvider<MeshProperties> {
-  constructor(private mesh: THREE.Mesh) {}
+export class MeshPropertyProvider extends BasePropertyProvider<MeshProperties> implements PropertyProvider<MeshProperties> {
+  protected readonly type = 'mesh' as const;
+  protected readonly object: THREE.Mesh;
+
+  constructor(mesh: THREE.Mesh) {
+    super();
+    this.object = mesh;
+  }
 
   getProperties(): MeshProperties {
-    const material = this.mesh.material as THREE.MeshBasicMaterial;
-    const clonedMaterial = material.clone();
-    // Ensure material properties are properly copied
-    clonedMaterial.color = material.color.clone();
-    clonedMaterial.opacity = material.opacity;
-    clonedMaterial.transparent = material.transparent;
-    
+    const material = this.object.material as THREE.MeshBasicMaterial;
+    return this.cloneProperties({
+      type: this.type,
+      position: this.object.position,
+      rotation: this.object.rotation,
+      scale: this.object.scale,
+      material
+    });
+  }
+
+  cloneProperties(props: MeshProperties): MeshProperties {
+    const material = props.material.clone();
+    material.color = props.material.color.clone();
+    material.opacity = props.material.opacity;
+    material.transparent = props.material.transparent;
+    material.needsUpdate = true;
+
     return {
-      type: 'mesh',
-      position: this.mesh.position.clone(),
-      rotation: this.mesh.rotation.clone(),
-      scale: this.mesh.scale.clone(),
-      material: clonedMaterial
+      ...this.cloneTransformBase(props),
+      type: this.type,
+      material
     };
   }
 
   applyProperties(props: MeshProperties): void {
-    this.mesh.position.copy(props.position);
-    this.mesh.rotation.copy(props.rotation);
-    this.mesh.scale.copy(props.scale);
+    this.object.position.copy(props.position);
+    this.object.rotation.copy(props.rotation);
+    this.object.scale.copy(props.scale);
 
-    const material = this.mesh.material as THREE.MeshBasicMaterial;
-    material.color.copy(props.material.color);
-    material.opacity = props.material.opacity;
-    material.transparent = props.material.transparent;
-    material.needsUpdate = true;
+    const material = this.object.material as THREE.MeshBasicMaterial;
+    if (material) {
+      material.color = new THREE.Color(props.material.color.getHex());
+      material.opacity = props.material.opacity;
+      material.transparent = props.material.transparent;
+      material.needsUpdate = true;
+    }
   }
 } 
