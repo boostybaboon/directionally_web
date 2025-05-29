@@ -6,12 +6,18 @@ export class MeshPropertyProvider implements PropertyProvider<MeshProperties> {
 
   getProperties(): MeshProperties {
     const material = this.mesh.material as THREE.MeshBasicMaterial;
+    const clonedMaterial = material.clone();
+    // Ensure material properties are properly copied
+    clonedMaterial.color = material.color.clone();
+    clonedMaterial.opacity = material.opacity;
+    clonedMaterial.transparent = material.transparent;
+    
     return {
       type: 'mesh',
       position: this.mesh.position.clone(),
       rotation: this.mesh.rotation.clone(),
       scale: this.mesh.scale.clone(),
-      material: material.clone()
+      material: clonedMaterial
     };
   }
 
@@ -24,5 +30,6 @@ export class MeshPropertyProvider implements PropertyProvider<MeshProperties> {
     material.color.copy(props.material.color);
     material.opacity = props.material.opacity;
     material.transparent = props.material.transparent;
+    material.needsUpdate = true;
   }
 } 
