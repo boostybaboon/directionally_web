@@ -1,11 +1,17 @@
 import * as THREE from 'three';
+import type { PropertyProvider } from './PropertyProvider';
+
+export interface SelectedObject {
+  object: THREE.Object3D;
+  propertyProvider: PropertyProvider;
+}
 
 export interface SelectionListener {
-    onSelectionChanged(selectedObjects: THREE.Object3D[]): void;
+  onSelectionChanged(selectedObjects: SelectedObject[]): void;
 }
 
 export interface SceneSelector {
-    getSelectedObjects(): THREE.Object3D[];
-    setSelectedObjects(objects: THREE.Object3D[]): void;
-    addSelectionListener(listener: SelectionListener): () => void;
+  getSelectedObjects(): SelectedObject[];
+  setSelectedObjects(objects: THREE.Object3D[]): void;
+  addSelectionListener(listener: SelectionListener): () => void;
 } 

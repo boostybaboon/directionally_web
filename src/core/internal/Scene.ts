@@ -4,11 +4,14 @@ import type { Command } from './Command';
 import type { CommandExecutor } from '../interfaces/CommandExecutor';
 import type { SceneChanger } from '../interfaces/SceneChanger';
 import type { SceneViewer } from '../interfaces/SceneViewer';
-import type { SceneSelector, SelectionListener } from '../interfaces/SceneSelector';
+import type { SceneSelector, SelectionListener, SelectedObject } from '../interfaces/SceneSelector';
 import type { CameraView } from '../interfaces/CameraView';
 import type { SceneChangeObserver } from '../interfaces/SceneChangeObserver';
 import { CameraType } from '../types/CameraType';
 import { SingleCameraView } from './views/SingleCameraView';
+import { PropertyProviderFactory } from './providers/PropertyProviderFactory';
+import { ApplyPropertiesCommand } from './commands/ApplyPropertiesCommand';
+import type { ObjectProperties } from '../interfaces/PropertyProvider';
 
 //SceneSelector could be a separate object potentially, if that was an advantage
 export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneSelector {
@@ -19,7 +22,7 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneS
     private nextCameraId: number = 0;
     private cameraViews: CameraView[] = [];
     private sceneChangeObservers: SceneChangeObserver[] = [];
-    private selectedObjects: THREE.Object3D[] = [];
+    private selectedObjects: SelectedObject[] = [];
     private selectionListeners: SelectionListener[] = [];
 
     constructor() {
@@ -131,13 +134,37 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneS
         }
     }
 
+    public updateObjectProperties(object: THREE.Object3D, properties: ObjectProperties): void {
+        const command = new ApplyPropertiesCommand(object, properties, this.getCurrentProperties(object));
+        this.execute(command);
+    }
+
+    private getCurrentProperties(object: THREE.Object3D): ObjectProperties {
+        const provider = PropertyProviderFactory.createProvider(object);
+        if (provider) {
+            return provider.getProperties();
+        }
+        // Return default transform properties if no provider exists
+        return {
+            position: object.position.clone(),
+            rotation: object.rotation.clone(),
+            scale: object.scale.clone()
+        };
+    }
+
     // SceneSelector implementation
-    public getSelectedObjects(): THREE.Object3D[] {
+    public getSelectedObjects(): SelectedObject[] {
         return [...this.selectedObjects];
     }
 
     public setSelectedObjects(objects: THREE.Object3D[]): void {
-        this.selectedObjects = [...objects];
+        this.selectedObjects = objects
+            .map(obj => {
+                const provider = PropertyProviderFactory.createProvider(obj);
+                return provider ? { object: obj, propertyProvider: provider } : null;
+            })
+            .filter((selected): selected is SelectedObject => selected !== null);
+        
         this.notifySelectionListeners();
     }
 
@@ -152,7 +179,8 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneS
     }
 
     private notifySelectionListeners(): void {
-        const selectedObjects = this.getSelectedObjects();
-        this.selectionListeners.forEach(listener => listener.onSelectionChanged(selectedObjects));
+        this.selectionListeners.forEach(listener => 
+            listener.onSelectionChanged(this.getSelectedObjects())
+        );
     }
 }
