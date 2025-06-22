@@ -6,4 +6,5 @@ export interface SceneViewer {
     getCameraViews(): readonly CameraView[];
     getScene(): THREE.Scene;
     addSceneChangeObserver(observer: SceneChangeObserver): () => void;
+    update(): void;
 }

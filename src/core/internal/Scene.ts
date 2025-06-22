@@ -24,6 +24,9 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneS
     private sceneChangeObservers: SceneChangeObserver[] = [];
     private selectedObjects: SelectedObject[] = [];
     private selectionListeners: SelectionListener[] = [];
+    private mixers: THREE.AnimationMixer[] = [];
+    private animationDict: { [key: string]: THREE.AnimationAction } = {};
+    private clock: THREE.Clock = new THREE.Clock();
 
     constructor() {
         this.threeScene = new THREE.Scene();
@@ -183,5 +186,37 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneS
         this.selectionListeners.forEach(listener => 
             listener.onSelectionChanged(this.getSelectedObjects())
         );
+    }
+
+    public update(): void {
+        const delta = this.clock.getDelta();
+        this.mixers.forEach(mixer => mixer.update(delta));
+    }
+
+    public addAnimationMixer(mixer: THREE.AnimationMixer): void {
+        this.mixers.push(mixer);
+    }
+
+    public removeAnimationMixer(mixer: THREE.AnimationMixer): void {
+        const index = this.mixers.indexOf(mixer);
+        if (index !== -1) {
+            this.mixers.splice(index, 1);
+        }
+    }
+
+    public addAnimationAction(id: string, action: THREE.AnimationAction): void {
+        this.animationDict[id] = action;
+    }
+
+    public removeAnimationAction(id: string): void {
+        delete this.animationDict[id];
+    }
+
+    public getAnimationAction(id: string): THREE.AnimationAction | undefined {
+        return this.animationDict[id];
+    }
+
+    public getAnimationActions(): { [key: string]: THREE.AnimationAction } {
+        return { ...this.animationDict };
     }
 }
