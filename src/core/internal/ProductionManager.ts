@@ -1,5 +1,6 @@
 import { Scene } from './Scene';
 import { AddDesignCamera } from './commands/AddDesignCamera';
+import { AnimationManagerImpl } from './AnimationManagerImpl';
 import * as THREE from 'three';
 import type { Production } from '../interfaces/Production';
 
@@ -15,15 +16,16 @@ export class ProductionManager {
     return ProductionManager.instance;
   }
   
-  public createProduction(): Production {
-    const scene = new Scene();
+  public createProduction(clock?: THREE.Clock): Production {
+    const scene = new Scene(clock);
     this.createDefaultCameraViews(scene);
     
     return {
       commandExecutor: scene,
       sceneChanger: scene,
       sceneViewer: scene,
-      sceneSelector: scene
+      sceneSelector: scene,
+      animationManager: new AnimationManagerImpl(scene)
     };
   }
   

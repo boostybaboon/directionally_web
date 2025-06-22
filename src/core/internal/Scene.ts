@@ -26,11 +26,12 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneS
     private selectionListeners: SelectionListener[] = [];
     private mixers: THREE.AnimationMixer[] = [];
     private animationDict: { [key: string]: THREE.AnimationAction } = {};
-    private clock: THREE.Clock = new THREE.Clock();
+    private clock: THREE.Clock;
 
-    constructor() {
+    constructor(clock?: THREE.Clock) {
         this.threeScene = new THREE.Scene();
         this.commandHistory = new CommandHistory();
+        this.clock = clock || new THREE.Clock();
     }
 
     public getScene(): THREE.Scene {

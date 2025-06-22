@@ -1,14 +1,27 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import * as THREE from 'three';
 import { AddAnimationCommand } from '$core/internal/commands/AddAnimationCommand';
-import { ProductionImpl } from '$core/internal/ProductionImpl';
+import { ProductionManager } from '$core/internal/ProductionManager';
+import type { Production } from '$core/interfaces/Production';
 
 describe('AddAnimationCommand', () => {
-    let production: ProductionImpl;
+    let production: Production;
     let cube: THREE.Mesh;
+    let mockClock: THREE.Clock;
+    let currentDelta = 0;
 
     beforeEach(() => {
-        production = new ProductionImpl();
+        // Create a mock clock that allows setting delta values for testing
+        currentDelta = 0;
+        mockClock = {
+            getDelta: () => currentDelta,
+            start: () => {},
+            stop: () => {},
+            getElapsedTime: () => 0,
+            autoStart: true
+        } as THREE.Clock;
+        
+        production = ProductionManager.getInstance().createProduction(mockClock);
         
         // Create a test cube
         const geometry = new THREE.BoxGeometry();
@@ -41,38 +54,30 @@ describe('AddAnimationCommand', () => {
         // Start animation
         animation!.play();
 
-        // Advance time directly on the mixer
-        const advanceTime = (delta: number) => {
-            // Access the scene's animation actions directly
-            const scene = production.sceneViewer as any;
-            const action = scene.getAnimationAction('moveCube');
-            console.log('Action found:', !!action, 'Delta:', delta);
-            if (action) {
-                console.log('Action time before:', action.time);
-                action.getMixer().update(delta);
-                console.log('Action time after:', action.time);
-                console.log('Cube position after update:', cube.position.x);
-            }
-        };
-
-        // Check position at different times by advancing
-        advanceTime(0);  // Start at 0
+        // Check position at different times by advancing with specific deltas
+        currentDelta = 0;
+        production.sceneViewer.update();
         expect(cube.position.x).toBeCloseTo(0);
 
-        advanceTime(0.2);  // Advance by 0.2s to reach 0.2s
+        currentDelta = 0.2;
+        production.sceneViewer.update();
         expect(cube.position.x).toBeCloseTo(1);
 
-        advanceTime(0.2);  // Advance by another 0.2s to reach 0.4s
+        currentDelta = 0.2;
+        production.sceneViewer.update();
         expect(cube.position.x).toBeCloseTo(2);
 
         // Test pause
         animation!.pause();
         const pausedPos = cube.position.x;
-        advanceTime(0.5);  // Advance by 0.5s while paused
+        currentDelta = 0.4; // Should not advance while paused
+        production.sceneViewer.update();
         expect(cube.position.x).toBeCloseTo(pausedPos);
 
         // Test rewind
         animation!.stopAndReset();
+        currentDelta = 0.5;
+        production.sceneViewer.update();
         expect(cube.position.x).toBeCloseTo(0);
     });
 
