@@ -3,6 +3,7 @@
   import ProductionPanel from '../panels/ProductionPanel.svelte';
   import CatalogPanel from '../panels/CatalogPanel.svelte';
   import SceneGraphPanel from '../panels/SceneGraphPanel.svelte';
+  import AnimationPanel from '../panels/AnimationPanel.svelte';
   import type { ProductionContext } from '$lib/types/ProductionContext';
   import { onMount } from 'svelte';
 
@@ -10,13 +11,14 @@
   const productionContext = getContext<ProductionContext>('production');
 
   // Simple enum-like type for tab IDs
-  type TabId = 'production' | 'catalog' | 'sceneGraph';
+  type TabId = 'production' | 'catalog' | 'sceneGraph' | 'animations';
   
   // Tab definitions
   const tabs = [
     { id: 'production' as TabId, icon: '📄', title: 'Production' },
     { id: 'catalog' as TabId, icon: '📚', title: 'Catalog' },
-    { id: 'sceneGraph' as TabId, icon: '🌲', title: 'Scene Graph' }
+    { id: 'sceneGraph' as TabId, icon: '🌲', title: 'Scene Graph' },
+    { id: 'animations' as TabId, icon: '🎬', title: 'Animations' }
   ];
 
   // Panel state
@@ -76,6 +78,13 @@
         <div class="panel-header">Scene Graph</div>
         <div class="panel-body">
           <SceneGraphPanel />
+        </div>
+      </div>
+
+      <div class="panel" class:active={activeTab === 'animations'}>
+        <div class="panel-header">Animations</div>
+        <div class="panel-body">
+          <AnimationPanel />
         </div>
       </div>
     </div>

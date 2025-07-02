@@ -1,9 +1,7 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import { getContext } from 'svelte';
   import * as THREE from 'three';
   import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-  import type { ProductionContext } from '$lib/types/ProductionContext';
   import type { SceneViewer } from '$core/interfaces/SceneViewer';
   import type { CameraView } from '$core/interfaces/CameraView';
   import { CameraType } from '$core/types/CameraType';
@@ -89,6 +87,9 @@
     if (!renderer || !activeCamera) return;
     
     requestAnimationFrame(animate);
+    
+    // Update scene (this updates animations)
+    scene.update();
     
     // Update controls if they exist
     if (controls) {
