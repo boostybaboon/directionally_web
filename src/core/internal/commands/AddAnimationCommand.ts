@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { Command } from '../Command';
 import type { CommandExecutor } from '../../interfaces/CommandExecutor';
 import type { Scene } from '../Scene';
+import { AnimationManagerImpl } from '../AnimationManagerImpl';
 
 export class AddAnimationCommand implements Command {
     constructor(
@@ -10,15 +11,15 @@ export class AddAnimationCommand implements Command {
         private readonly property: string,
         private readonly startValue: number | THREE.Vector3,
         private readonly endValue: number | THREE.Vector3,
-        private readonly startTime: number,
-        private readonly endTime: number
+        private readonly startTime: number,  // Now represents global timeline time
+        private readonly duration: number    // Animation duration
     ) {}
 
     execute(executor: CommandExecutor): void {
         const scene = executor as Scene;
         
         // Create keyframe track
-        const times = [this.startTime, this.endTime];
+        const times = [0, this.duration]; // Local animation timeline (0 to duration)
         const values = this.createKeyframeValues();
         const track = new THREE.KeyframeTrack(this.property, times, values);
         
@@ -29,9 +30,15 @@ export class AddAnimationCommand implements Command {
         const mixer = new THREE.AnimationMixer(this.object);
         const action = mixer.clipAction(clip);
         
-        // Store in scene
+        // Store in scene (for mixer management)
         scene.addAnimationMixer(mixer);
         scene.addAnimationAction(this.id, action);
+        
+        // Register with timeline manager (NEW)
+        const animationManager = scene.getAnimationManager();
+        if (animationManager instanceof AnimationManagerImpl) {
+            animationManager.addTimelineAnimation(this.id, action, this.startTime, this.duration);
+        }
     }
 
     undo(executor: CommandExecutor): void {
@@ -40,6 +47,12 @@ export class AddAnimationCommand implements Command {
         if (action) {
             scene.removeAnimationMixer(action.getMixer());
             scene.removeAnimationAction(this.id);
+            
+            // Remove from timeline manager
+            const animationManager = scene.getAnimationManager();
+            if (animationManager instanceof AnimationManagerImpl) {
+                animationManager.removeTimelineAnimation(this.id);
+            }
         }
     }
 

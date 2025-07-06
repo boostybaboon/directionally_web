@@ -2,11 +2,13 @@ import { describe, it, expect } from 'vitest';
 import * as THREE from 'three';
 import { Scene } from '$core/internal/Scene';
 import { CameraType } from '$core/types/CameraType';
+import { ToneProviderMock } from '../mocks/ToneProviderMock';
 
 describe('Scene with Camera Views', () => {
     it('should add design camera with associated CameraView', () => {
         // Arrange
-        const scene = new Scene();
+        const toneMock = new ToneProviderMock();
+        const scene = new Scene(toneMock, undefined);
         const camera = new THREE.PerspectiveCamera(75, 16/9, 0.1, 1000);
         
         // Act
@@ -23,7 +25,8 @@ describe('Scene with Camera Views', () => {
     
     it('should add playback camera with associated CameraView', () => {
         // Arrange
-        const scene = new Scene();
+        const toneMock = new ToneProviderMock();
+        const scene = new Scene(toneMock, undefined);
         const camera = new THREE.PerspectiveCamera(75, 16/9, 0.1, 1000);
         
         // Act
@@ -40,7 +43,8 @@ describe('Scene with Camera Views', () => {
     
     it('should remove CameraView when removing a camera', () => {
         // Arrange
-        const scene = new Scene();
+        const toneMock = new ToneProviderMock();
+        const scene = new Scene(toneMock, undefined);
         const designCamera = new THREE.PerspectiveCamera(75, 16/9, 0.1, 1000);
         const playbackCamera = new THREE.PerspectiveCamera(60, 4/3, 0.1, 1000);
         

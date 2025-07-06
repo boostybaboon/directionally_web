@@ -2,12 +2,14 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import * as THREE from 'three';
 import { AddAnimationCommand } from '$core/internal/commands/AddAnimationCommand';
 import { ProductionManager } from '$core/internal/ProductionManager';
+import { ToneProviderMock } from '../../mocks/ToneProviderMock';
 import type { Production } from '$core/interfaces/Production';
 
 describe('AddAnimationCommand', () => {
     let production: Production;
     let cube: THREE.Mesh;
     let mockClock: THREE.Clock;
+    let toneMock: ToneProviderMock;
     let currentDelta = 0;
 
     beforeEach(() => {
@@ -21,7 +23,10 @@ describe('AddAnimationCommand', () => {
             autoStart: true
         } as THREE.Clock;
         
-        production = ProductionManager.getInstance().createProduction(mockClock);
+        // Create a mock tone provider for testing
+        toneMock = new ToneProviderMock();
+        
+        production = ProductionManager.getInstance().createProduction(toneMock, mockClock);
         
         // Create a test cube
         const geometry = new THREE.BoxGeometry();
@@ -40,8 +45,8 @@ describe('AddAnimationCommand', () => {
             '.position',
             startPos,
             endPos,
-            0,
-            1
+            0,  // Start at 0 seconds in global timeline
+            1   // Duration of 1 second
         );
 
         // Execute command on production
@@ -51,31 +56,31 @@ describe('AddAnimationCommand', () => {
         const animation = production.animationManager.getAnimation('moveCube');
         expect(animation).toBeDefined();
 
-        // Start animation
-        animation!.play();
-
-        // Check position at different times by advancing with specific deltas
-        currentDelta = 0;
-        production.sceneViewer.update();
+        // Check initial position
         expect(cube.position.x).toBeCloseTo(0);
 
-        currentDelta = 0.2;
-        production.sceneViewer.update();
-        expect(cube.position.x).toBeCloseTo(1);
+        // Advance timeline to 0.2 seconds - animation should be 20% complete
+        toneMock.triggerEventsUpTo(0.2); // Trigger scheduled events up to 0.2s
+        currentDelta = 0.2; // Set clock delta for smooth animation
+        production.sceneViewer.update(); // Update scene to apply animation
+        expect(cube.position.x).toBeCloseTo(1); // 20% of 5 = 1
 
-        currentDelta = 0.2;
+        // Advance timeline to 0.4 seconds - animation should be 40% complete
+        toneMock.triggerEventsUpTo(0.4); // Trigger scheduled events up to 0.4s
+        currentDelta = 0.2; // Set clock delta for smooth animation
         production.sceneViewer.update();
-        expect(cube.position.x).toBeCloseTo(2);
+        expect(cube.position.x).toBeCloseTo(2); // 40% of 5 = 2
 
         // Test pause
-        animation!.pause();
+        production.animationManager.pause();
         const pausedPos = cube.position.x;
-        currentDelta = 0.4; // Should not advance while paused
+        toneMock.triggerEventsUpTo(0.6); // Should not advance while paused
+        currentDelta = 0.2;
         production.sceneViewer.update();
         expect(cube.position.x).toBeCloseTo(pausedPos);
 
-        // Test rewind
-        animation!.stopAndReset();
+        // Test stop and reset
+        production.animationManager.stop();
         currentDelta = 0.5;
         production.sceneViewer.update();
         expect(cube.position.x).toBeCloseTo(0);

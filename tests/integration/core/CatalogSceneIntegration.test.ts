@@ -4,12 +4,14 @@ import { StandardCatalogBuilder } from '$core/internal/catalog/StandardCatalogBu
 import { Scene } from '$core/internal/Scene';
 import { CatalogItemType } from '$core/types/CatalogItemType';
 import type { CatalogItem } from '$core/interfaces/Catalog';
+import { ToneProviderMock } from '../../mocks/ToneProviderMock';
 
 describe('Catalog and Scene Integration', () => {
     it('should add a cube from catalog to scene', () => {
         // Arrange
         const catalog = StandardCatalogBuilder.build();
-        const scene = new Scene();
+        const toneMock = new ToneProviderMock();
+        const scene = new Scene(toneMock, undefined);
 
         // Find the cube item in the catalog
         const cubeItem = catalog.getItemsByType(CatalogItemType.Mesh)
@@ -35,7 +37,8 @@ describe('Catalog and Scene Integration', () => {
     it('should add and remove a directional light from catalog to scene', () => {
         // Arrange
         const catalog = StandardCatalogBuilder.build();
-        const scene = new Scene();
+        const toneMock = new ToneProviderMock();
+        const scene = new Scene(toneMock, undefined);
 
         // Find the directional light item in the catalog
         const lightItem = catalog.getItemsByType(CatalogItemType.Light)

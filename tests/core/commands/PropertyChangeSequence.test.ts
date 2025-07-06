@@ -5,11 +5,13 @@ import { StandardCatalogBuilder } from '$core/internal/catalog/StandardCatalogBu
 import { CatalogItemType } from '$core/types/CatalogItemType';
 import type { CatalogItem } from '$core/interfaces/Catalog';
 import type { MeshProperties } from '$core/interfaces/PropertyProvider';
+import { ToneProviderMock } from '../../mocks/ToneProviderMock';
 
 describe('Property Change Sequence', () => {
     it('should maintain correct state through undo/redo sequence', () => {
         // Arrange
-        const scene = new Scene();
+        const toneMock = new ToneProviderMock();
+        const scene = new Scene(toneMock, undefined);
         const catalog = StandardCatalogBuilder.build();
         
         // Find the sphere item in the catalog

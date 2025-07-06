@@ -1,8 +1,8 @@
 import { Scene } from './Scene';
 import { AddDesignCamera } from './commands/AddDesignCamera';
-import { AnimationManagerImpl } from './AnimationManagerImpl';
 import * as THREE from 'three';
 import type { Production } from '../interfaces/Production';
+import type { ToneProvider } from '../interfaces/ToneProvider';
 
 export class ProductionManager {
   private static instance: ProductionManager;
@@ -16,8 +16,8 @@ export class ProductionManager {
     return ProductionManager.instance;
   }
   
-  public createProduction(clock?: THREE.Clock): Production {
-    const scene = new Scene(clock);
+  public createProduction(toneProvider: ToneProvider, clock?: THREE.Clock): Production {
+    const scene = new Scene(toneProvider, clock);
     this.createDefaultCameraViews(scene);
     
     return {
@@ -25,7 +25,7 @@ export class ProductionManager {
       sceneChanger: scene,
       sceneViewer: scene,
       sceneSelector: scene,
-      animationManager: new AnimationManagerImpl(scene)
+      animationManager: scene.getAnimationManager()
     };
   }
   

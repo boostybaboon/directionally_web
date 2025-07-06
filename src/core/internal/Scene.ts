@@ -7,6 +7,9 @@ import type { SceneViewer } from '../interfaces/SceneViewer';
 import type { SceneSelector, SelectionListener, SelectedObject } from '../interfaces/SceneSelector';
 import type { CameraView } from '../interfaces/CameraView';
 import type { SceneChangeObserver } from '../interfaces/SceneChangeObserver';
+import type { AnimationManager } from '../interfaces/AnimationManager';
+import type { ToneProvider } from '../interfaces/ToneProvider';
+import { AnimationManagerImpl } from './AnimationManagerImpl';
 import { CameraType } from '../types/CameraType';
 import { SingleCameraView } from './views/SingleCameraView';
 import { PropertyProviderFactory } from './providers/PropertyProviderFactory';
@@ -27,11 +30,13 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneS
     private mixers: THREE.AnimationMixer[] = [];
     private animationDict: { [key: string]: THREE.AnimationAction } = {};
     private clock: THREE.Clock;
+    private animationManager: AnimationManagerImpl;
 
-    constructor(clock?: THREE.Clock) {
+    constructor(toneProvider: ToneProvider, clock?: THREE.Clock) {
         this.threeScene = new THREE.Scene();
         this.commandHistory = new CommandHistory();
         this.clock = clock || new THREE.Clock();
+        this.animationManager = new AnimationManagerImpl(this, toneProvider);
     }
 
     public getScene(): THREE.Scene {
@@ -219,5 +224,9 @@ export class Scene implements CommandExecutor, SceneChanger, SceneViewer, SceneS
 
     public getAnimationActions(): { [key: string]: THREE.AnimationAction } {
         return { ...this.animationDict };
+    }
+
+    public getAnimationManager(): AnimationManager {
+        return this.animationManager;
     }
 }
